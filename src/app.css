@@ -1,0 +1,126 @@
+:root {
+  /* Helles Theme (Standard) – warmes Leinen mit Türkis-Schimmer */
+  --bg: #e6e1d3;
+  --bg-deco: radial-gradient(1100px 520px at 50% -10%, rgba(46, 196, 182, 0.18), transparent 60%);
+  --surface: #f5f1e8;
+  --surface-2: #ddd6c4;
+  --surface-2-h: #d2cab5;
+  --line: rgba(40, 35, 60, 0.12);
+  --text: #2a2533;
+  --muted: #6e6880;
+  --ring: rgba(42, 37, 51, 0.35);
+  --dot-border: rgba(42, 37, 51, 0.45);
+  --shadow: 0 4px 10px rgba(40, 30, 20, 0.18);
+  --backdrop: rgba(38, 33, 50, 0.45);
+  --logo-accent: #cf8a1d;
+  --ink: #211c33;
+  --koralle: #ff6b5e;
+  --gold: #ffb648;
+  --tuerkis: #2ec4b6;
+  --lila: #9d6bf5;
+  --radius: 14px;
+  --card-w: 64px;
+  --card-h: 96px;
+}
+
+html[data-theme="dark"] {
+  /* Dunkles Theme – neutrales Anthrazit */
+  --bg: #28252e;
+  --bg-deco: radial-gradient(1100px 520px at 50% -10%, rgba(46, 196, 182, 0.08), transparent 60%);
+  --surface: #332f3b;
+  --surface-2: #3f3a4a;
+  --surface-2-h: #4a4458;
+  --line: rgba(255, 255, 255, 0.11);
+  --text: #f4f1fa;
+  --muted: #a9a3b8;
+  --ring: rgba(255, 255, 255, 0.5);
+  --dot-border: rgba(255, 255, 255, 0.7);
+  --shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+  --backdrop: rgba(10, 9, 14, 0.7);
+  --logo-accent: var(--gold);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+#app {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+body {
+  font-family: ui-rounded, "SF Pro Rounded", "Segoe UI", system-ui, sans-serif;
+  background: var(--bg-deco), var(--bg);
+  color: var(--text);
+  height: 100dvh;
+  overflow: hidden;
+  user-select: none;
+  transition: background 0.3s, color 0.3s;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+button:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+.btn {
+  border-radius: 12px;
+  padding: 12px 18px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  transition: transform 0.15s, background 0.15s;
+}
+
+.btn:hover {
+  transform: scale(1.03);
+  background: var(--surface-2-h);
+}
+
+.btn.primary {
+  background: var(--gold);
+  color: var(--ink);
+}
+
+.btn.primary:hover {
+  background: #ffc86e;
+}
+
+.btn.active {
+  background: var(--gold);
+  color: var(--ink);
+}
+
+@media (min-width: 600px) {
+  :root {
+    --card-w: 78px;
+    --card-h: 117px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

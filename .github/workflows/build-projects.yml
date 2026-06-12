@@ -1,0 +1,32 @@
+name: build and package docker image
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build:
+    name: external workflow
+    uses: tehw0lf/workflows/.github/workflows/build-test-publish.yml@main
+    permissions:
+      id-token: write
+      actions: write
+      attestations: write
+      contents: write
+      packages: write
+      security-events: write
+      pull-requests: write
+    with:
+      tool: "npm"
+      install: "ci"
+      lint: "run check"
+      test: "run test"
+      build_branch: "run build"
+      build_main: "run build"
+      docker_meta: '[{"name":"farbduell","file":"Dockerfile"}]'
+      artifact_path: "dist"
+      platforms: "linux/arm64"
+      cyclonedx_ignore_npm_errors: true
+      npm_audit_omit_dev: true
