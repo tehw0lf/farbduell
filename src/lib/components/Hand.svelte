@@ -8,8 +8,9 @@
     view: PlayerView;
     onplay: (card: CardT) => void;
     lang: Lang;
+    showPlayable: boolean;
   }
-  let { view, onplay, lang }: Props = $props();
+  let { view, onplay, lang, showPlayable }: Props = $props();
 
   const myTurn = $derived(view.turn === view.you && view.phase === "playing");
 </script>
@@ -17,7 +18,7 @@
 <div class="hand" class:my-turn={myTurn} role="list">
   {#each view.yourHand as card (card.id)}
     {@const playable = myTurn && isPlayableInView(view, card)}
-    <div class="slot" class:playable class:dim={!playable} role="listitem">
+    <div class="slot" class:playable class:dim={showPlayable && !playable} class:ring={showPlayable && playable} role="listitem">
       <Card {card} {playable} {lang} onclick={() => playable && onplay(card)} />
     </div>
   {/each}
@@ -41,7 +42,7 @@
     z-index: 2;
     position: relative;
   }
-  .my-turn .slot.playable :global(.card) {
+  .my-turn .slot.ring :global(.card) {
     box-shadow: var(--shadow), 0 0 0 2px var(--ring);
   }
   @media (min-width: 600px) {

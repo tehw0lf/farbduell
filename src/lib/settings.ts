@@ -9,6 +9,8 @@ export interface Settings {
   theme: "light" | "dark";
   lang: Lang;
   sound: boolean;
+  /** Spielbare Karten hervorheben (dimmt nicht-spielbare) */
+  showPlayable: boolean;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -18,6 +20,7 @@ export const DEFAULT_SETTINGS: Settings = {
   theme: "light",
   lang: "de",
   sound: true,
+  showPlayable: false,
 };
 
 const KEY = "farbduell-settings";
@@ -35,6 +38,7 @@ export function loadSettings(): Settings {
       theme: raw.theme === "dark" ? "dark" : "light",
       lang: raw.lang === "en" ? "en" : "de",
       sound: raw.sound === false ? false : true,
+      showPlayable: raw.showPlayable === true ? true : false,
     };
   } catch {
     return structuredClone(DEFAULT_SETTINGS);

@@ -249,6 +249,20 @@
       >{t.soundOff}</button>
     </div>
 
+    <div class="set-label">{t.showPlayableLabel}</div>
+    <button
+      class="rule"
+      class:on={settings.showPlayable}
+      aria-pressed={settings.showPlayable}
+      onclick={() => onsettings({ showPlayable: !settings.showPlayable })}
+    >
+      <span class="rule-check" aria-hidden="true"></span>
+      <span class="rule-text">
+        <strong>{t.showPlayableLabel}</strong>
+        {t.showPlayableDesc}
+      </span>
+    </button>
+
     <button class="btn spaced" onclick={onclosesettings}>{t.close}</button>
   </div>
 </div>

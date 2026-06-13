@@ -15,8 +15,8 @@ export const TRANSLATIONS = {
     yourDecision: "Deine Entscheidung.",
     penaltyStackPlayable: (n: number) => `Strafstapel: ${n} Karten – leg eine +2 drauf oder zieh sie.`,
     penaltyStackDraw: (n: number) => `Keine +2 auf der Hand – zieh die ${n} Strafkarten.`,
-    yourTurn: "Du bist dran. Lass dir Zeit.",
-    drawCard: "Nichts passt – zieh eine Karte vom Stapel.",
+    yourTurn: "Du bist dran.",
+    drawCard: "Nichts passt – zieh.",
 
     // Toast messages
     drew: (name: string, you: boolean, n: number) =>
@@ -35,7 +35,7 @@ export const TRANSLATIONS = {
 
     // Player names
     you: "Du",
-    botNames: ["Mira", "Jonas", "Pia"] as string[],
+    botNames: ["Mira", "Jonas", "Pia", "Lena", "Kai", "Sara", "Tom", "Nina", "Max", "Eva"] as string[],
 
     // Colors
     colors: { koralle: "Koralle", gold: "Gold", tuerkis: "Türkis", lila: "Lila" } as Record<Color, string>,
@@ -86,6 +86,8 @@ export const TRANSLATIONS = {
     sound: "Sound",
     soundOn: "An",
     soundOff: "Aus",
+    showPlayableLabel: "Spielbare Karten",
+    showPlayableDesc: "Nicht spielbare Karten werden abgedunkelt und spielbare hervorgehoben.",
     close: "Schließen",
   },
   en: {
@@ -100,8 +102,8 @@ export const TRANSLATIONS = {
     yourDecision: "Your decision.",
     penaltyStackPlayable: (n: number) => `Penalty stack: ${n} cards – play a +2 or draw them.`,
     penaltyStackDraw: (n: number) => `No +2 in hand – draw the ${n} penalty cards.`,
-    yourTurn: "Your turn. Take your time.",
-    drawCard: "Nothing fits – draw a card.",
+    yourTurn: "Your turn.",
+    drawCard: "Nothing fits – draw.",
 
     // Toast messages
     drew: (name: string, you: boolean, n: number) =>
@@ -120,7 +122,7 @@ export const TRANSLATIONS = {
 
     // Player names
     you: "You",
-    botNames: ["Mira", "Jonas", "Pia"] as string[],
+    botNames: ["Mira", "Jonas", "Pia", "Lena", "Kai", "Sara", "Tom", "Nina", "Max", "Eva"] as string[],
 
     // Colors
     colors: { koralle: "Coral", gold: "Gold", tuerkis: "Teal", lila: "Purple" } as Record<Color, string>,
@@ -171,6 +173,8 @@ export const TRANSLATIONS = {
     sound: "Sound",
     soundOn: "On",
     soundOff: "Off",
+    showPlayableLabel: "Highlight playable",
+    showPlayableDesc: "Dims cards that can't be played and highlights those that can.",
     close: "Close",
   },
 } as const;
