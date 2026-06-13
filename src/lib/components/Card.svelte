@@ -88,7 +88,7 @@
     border: 2px solid rgba(255, 255, 255, 0.85);
     background: linear-gradient(
       160deg,
-      color-mix(in srgb, var(--card-color) 80%, white),
+      color-mix(in srgb, var(--card-color) 90%, white),
       var(--card-color)
     );
     transition: transform 0.18s, box-shadow 0.18s, opacity 0.2s;

@@ -1,10 +1,10 @@
 :root {
   /* Helles Theme (Standard) – warmes Leinen mit Türkis-Schimmer */
-  --bg: #e6e1d3;
-  --bg-deco: radial-gradient(1100px 520px at 50% -10%, rgba(46, 196, 182, 0.18), transparent 60%);
-  --surface: #f5f1e8;
-  --surface-2: #ddd6c4;
-  --surface-2-h: #d2cab5;
+  --bg: #f0ece0;
+  --bg-deco: radial-gradient(1100px 520px at 50% -10%, rgba(0, 184, 168, 0.22), transparent 60%);
+  --surface: #faf8f2;
+  --surface-2: #e8e2d0;
+  --surface-2-h: #ddd6c0;
   --line: rgba(40, 35, 60, 0.12);
   --text: #2a2533;
   --muted: #6e6880;
@@ -14,10 +14,10 @@
   --backdrop: rgba(38, 33, 50, 0.45);
   --logo-accent: #cf8a1d;
   --ink: #211c33;
-  --koralle: #ff6b5e;
-  --gold: #ffb648;
-  --tuerkis: #2ec4b6;
-  --lila: #9d6bf5;
+  --koralle: #ff3d2e;
+  --gold: #ffa010;
+  --tuerkis: #00b8a8;
+  --lila: #8040f8;
   --radius: 14px;
   --card-w: 64px;
   --card-h: 96px;
