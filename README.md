@@ -1,6 +1,6 @@
 # Farbduell
 
-A relaxed card game – free, ad-free and **without a time limit** (optionally enabled). Installable as a PWA, runs fully offline against 1–3 bots.
+A color based card game – free, ad-free and configurable. Installable as a PWA, runs fully offline against 1–3 bots.
 
 [Deutsche Version](README-DE.md)
 

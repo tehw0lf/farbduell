@@ -1,6 +1,6 @@
 # Farbduell
 
-Das entspannte Kartenspiel – kostenlos, werbefrei und **ohne Zeitlimit** (optional zuschaltbar). Als PWA installierbar, läuft komplett offline gegen 1–3 Bots.
+Das farbbasierte Kartenspiel – kostenlos, werbefrei und konfigurierbar. Als PWA installierbar, läuft komplett offline gegen 1–3 Bots.
 
 ## Einstellungen
 

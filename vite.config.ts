@@ -1,5 +1,5 @@
-import { defineConfig } from "vite";
 import { svelte } from "@sveltejs/vite-plugin-svelte";
+import { defineConfig } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig({
@@ -9,7 +9,7 @@ export default defineConfig({
       registerType: "autoUpdate",
       includeAssets: ["icons/icon.svg"],
       manifest: {
-        name: "Farbduell – das entspannte Kartenspiel",
+        name: "Farbduell – das farbbasierte Kartenspiel",
         short_name: "Farbduell",
         description:
           "Kostenlos, werbefrei und ohne Zeitlimit gegen Bots spielen.",
