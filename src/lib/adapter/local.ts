@@ -7,6 +7,27 @@ import type { DispatchAction, GameAdapter, NewGameOptions } from "./types.ts";
 import { TRANSLATIONS } from "../i18n.ts";
 
 const HUMAN = 0;
+const PERSIST_KEY = "farbduell-gamestate";
+
+function saveState(state: GameState): void {
+  try {
+    localStorage.setItem(PERSIST_KEY, JSON.stringify(state));
+  } catch { /* private mode etc. */ }
+}
+
+function loadState(): GameState | null {
+  try {
+    const raw = localStorage.getItem(PERSIST_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw) as GameState;
+  } catch {
+    return null;
+  }
+}
+
+function clearState(): void {
+  try { localStorage.removeItem(PERSIST_KEY); } catch { /* ignore */ }
+}
 
 /** Bots im Browser: gleiche Engine, gleiche Bot-Logik wie ein späterer Server. */
 export class LocalAdapter implements GameAdapter {
@@ -21,6 +42,11 @@ export class LocalAdapter implements GameAdapter {
 
   constructor(opts: { botDelayMs?: () => number } = {}) {
     this.botDelay = opts.botDelayMs ?? (() => 900 + Math.random() * 900);
+    this.state = loadState();
+  }
+
+  get hasRestoredGame(): boolean {
+    return this.state !== null;
   }
 
   subscribe(cb: (view: PlayerView) => void): () => void {
@@ -32,9 +58,11 @@ export class LocalAdapter implements GameAdapter {
   newGame(opts: NewGameOptions): void {
     this.generation++;
     this.clearTimer();
+    clearState();
     const t = TRANSLATIONS[opts.lang];
+    const shuffled = [...t.botNames].sort(() => Math.random() - 0.5);
     this.state = createGame({
-      names: [t.you, ...t.botNames.slice(0, opts.botCount)],
+      names: [t.you, ...shuffled.slice(0, opts.botCount)],
       bots: [false, ...Array(opts.botCount).fill(true)],
       rules: opts.rules,
     });
@@ -64,6 +92,11 @@ export class LocalAdapter implements GameAdapter {
     this.emit();
   }
 
+  /** Nach App-Restore: Bots weiterlaufen lassen ohne State zu verändern. */
+  resumeBots(): void {
+    this.scheduleBots();
+  }
+
   destroy(): void {
     this.generation++;
     this.clearTimer();
@@ -74,6 +107,7 @@ export class LocalAdapter implements GameAdapter {
 
   private emit(): void {
     if (!this.state) return;
+    saveState(this.state);
     const view = playerView(this.state, HUMAN);
     for (const cb of this.listeners) cb(view);
   }

@@ -13,7 +13,7 @@
   import Modals from "./lib/components/Modals.svelte";
 
   /* Heute lokal – für Multiplayer wird hier ein RemoteAdapter eingesetzt. */
-  const adapter: GameAdapter = new LocalAdapter();
+  const adapter = new LocalAdapter();
 
   let settings = $state<Settings>(loadSettings());
   let view = $state<PlayerView | null>(null);
@@ -40,7 +40,11 @@
       for (const ev of v.events) handleEvent(v, ev);
       manageTimer(v);
     });
-    adapter.newGame({ botCount: settings.botCount, rules: settings.rules, lang: settings.lang });
+    if (adapter.hasRestoredGame) {
+      adapter.resumeBots();
+    } else {
+      adapter.newGame({ botCount: settings.botCount, rules: settings.rules, lang: settings.lang });
+    }
     return () => {
       unsub();
       adapter.destroy();
@@ -271,7 +275,7 @@
       {#if timeLeft > 0}
         <div class="timer" class:urgent={timeLeft <= 5} aria-live="polite" aria-atomic="true">⏱ {timeLeft} s</div>
       {/if}
-      <Hand {view} onplay={onPlay} lang={settings.lang} />
+      <Hand {view} onplay={onPlay} lang={settings.lang} showPlayable={settings.showPlayable} />
     </div>
   {/if}
 </main>
