@@ -13,8 +13,10 @@ export const TRANSLATIONS = {
     // Status messages
     thinking: (name: string) => `${name} überlegt …`,
     yourDecision: "Deine Entscheidung.",
-    penaltyStackPlayable: (n: number) => `Strafstapel: ${n} Karten – leg eine +2 drauf oder zieh sie.`,
-    penaltyStackDraw: (n: number) => `Keine +2 auf der Hand – zieh die ${n} Strafkarten.`,
+    penaltyStackPlayable: (n: number) =>
+      `Strafstapel: ${n} Karten – leg eine +2 drauf oder zieh sie.`,
+    penaltyStackDraw: (n: number) =>
+      `Keine +2 auf der Hand – zieh die ${n} Strafkarten.`,
     yourTurn: "Du bist dran.",
     drawCard: "Nichts passt – zieh.",
 
@@ -27,7 +29,8 @@ export const TRANSLATIONS = {
     skipped: (name: string, you: boolean) =>
       `${name} ${you ? "setzt du aus" : "setzt aus"}`,
     reversed: "Richtungswechsel!",
-    wishedColor: (name: string, color: string) => `${name} wünscht sich ${color}`,
+    wishedColor: (name: string, color: string) =>
+      `${name} wünscht sich ${color}`,
     lastCard: (name: string, you: boolean) =>
       `${name} ${you ? "rufst" : "ruft"}: „Letzte Karte!"`,
     reshuffled: "Ablagestapel neu gemischt",
@@ -35,10 +38,26 @@ export const TRANSLATIONS = {
 
     // Player names
     you: "Du",
-    botNames: ["Mira", "Jonas", "Pia", "Lena", "Kai", "Sara", "Tom", "Nina", "Max", "Eva"] as string[],
+    botNames: [
+      "Mira",
+      "Jonas",
+      "Pia",
+      "Lena",
+      "Kai",
+      "Sara",
+      "Tom",
+      "Nina",
+      "Max",
+      "Eva",
+    ] as string[],
 
     // Colors
-    colors: { koralle: "Koralle", gold: "Gold", tuerkis: "Türkis", lila: "Lila" } as Record<Color, string>,
+    colors: {
+      koralle: "Koralle",
+      gold: "Gold",
+      tuerkis: "Türkis",
+      lila: "Lila",
+    } as Record<Color, string>,
 
     // Table
     direction: "Richtung",
@@ -58,7 +77,8 @@ export const TRANSLATIONS = {
 
     // Modals – drawn decision
     drawnFits: "Passt sogar!",
-    drawnFitsHint: "Deine gezogene Karte kannst du direkt legen – musst du aber nicht.",
+    drawnFitsHint:
+      "Deine gezogene Karte kannst du direkt legen – musst du aber nicht.",
     keep: "Behalten",
     play: "Legen",
 
@@ -66,28 +86,33 @@ export const TRANSLATIONS = {
     youWon: "Gewonnen! 🎉",
     youWonHint: "Alle Karten abgelegt – ganz ohne Hektik.",
     opponentWon: (name: string) => `${name} gewinnt`,
-    opponentWonHint: "Nächste Runde läuft's. Zeit hast du ja genug.",
+    opponentWonHint: "Nächste Runde läuft's.",
     newRound: "Neue Runde",
 
     // Modals – settings
     settingsTitle: "Einstellungen",
-    settingsHint: "Mitspieler ändern startet eine neue Runde. Hausregeln gelten sofort.",
+    settingsHint:
+      "Mitspieler ändern startet eine neue Runde. Hausregeln gelten sofort.",
     opponents: "Mitspieler",
-    bot: (n: number) => n === 1 ? "1 Bot" : `${n} Bots`,
+    bot: (n: number) => (n === 1 ? "1 Bot" : `${n} Bots`),
     houseRules: "Hausregeln",
     stack2Label: "+2 stapeln",
-    stack2Desc: "Wer eine +2 bekommt, darf eine eigene +2 drauflegen – der Strafstapel wandert weiter.",
+    stack2Desc:
+      "Wer eine +2 bekommt, darf eine eigene +2 drauflegen – der Strafstapel wandert weiter.",
     drawToMatchLabel: "Ziehen, bis es passt",
-    drawToMatchDesc: "Statt einer Karte ziehst du so lange, bis eine passende kommt.",
+    drawToMatchDesc:
+      "Statt einer Karte ziehst du so lange, bis eine passende kommt.",
     timeLimitLabel: "Zeitlimit pro Zug",
     timeLimitOff: "Aus",
-    timeLimitHint: "Läuft die Zeit ab, ziehst du automatisch eine Karte. Standard: kein Limit.",
+    timeLimitHint:
+      "Läuft die Zeit ab, ziehst du automatisch eine Karte. Standard: kein Limit.",
     language: "Sprache",
     sound: "Sound",
     soundOn: "An",
     soundOff: "Aus",
     showPlayableLabel: "Spielbare Karten",
-    showPlayableDesc: "Nicht spielbare Karten werden abgedunkelt und spielbare hervorgehoben.",
+    showPlayableDesc:
+      "Nicht spielbare Karten werden abgedunkelt und spielbare hervorgehoben.",
     close: "Schließen",
   },
   en: {
@@ -100,8 +125,10 @@ export const TRANSLATIONS = {
     // Status messages
     thinking: (name: string) => `${name} is thinking …`,
     yourDecision: "Your decision.",
-    penaltyStackPlayable: (n: number) => `Penalty stack: ${n} cards – play a +2 or draw them.`,
-    penaltyStackDraw: (n: number) => `No +2 in hand – draw the ${n} penalty cards.`,
+    penaltyStackPlayable: (n: number) =>
+      `Penalty stack: ${n} cards – play a +2 or draw them.`,
+    penaltyStackDraw: (n: number) =>
+      `No +2 in hand – draw the ${n} penalty cards.`,
     yourTurn: "Your turn.",
     drawCard: "Nothing fits – draw.",
 
@@ -122,10 +149,26 @@ export const TRANSLATIONS = {
 
     // Player names
     you: "You",
-    botNames: ["Mira", "Jonas", "Pia", "Lena", "Kai", "Sara", "Tom", "Nina", "Max", "Eva"] as string[],
+    botNames: [
+      "Mira",
+      "Jonas",
+      "Pia",
+      "Lena",
+      "Kai",
+      "Sara",
+      "Tom",
+      "Nina",
+      "Max",
+      "Eva",
+    ] as string[],
 
     // Colors
-    colors: { koralle: "Coral", gold: "Gold", tuerkis: "Teal", lila: "Purple" } as Record<Color, string>,
+    colors: {
+      koralle: "Coral",
+      gold: "Gold",
+      tuerkis: "Teal",
+      lila: "Purple",
+    } as Record<Color, string>,
 
     // Table
     direction: "Direction",
@@ -145,7 +188,8 @@ export const TRANSLATIONS = {
 
     // Modals – drawn decision
     drawnFits: "It fits!",
-    drawnFitsHint: "You can play the card you just drew – but you don't have to.",
+    drawnFitsHint:
+      "You can play the card you just drew – but you don't have to.",
     keep: "Keep",
     play: "Play",
 
@@ -153,28 +197,33 @@ export const TRANSLATIONS = {
     youWon: "You won! 🎉",
     youWonHint: "All cards played – no rush needed.",
     opponentWon: (name: string) => `${name} wins`,
-    opponentWonHint: "Better luck next round. You've got time.",
+    opponentWonHint: "Better luck next round.",
     newRound: "New round",
 
     // Modals – settings
     settingsTitle: "Settings",
-    settingsHint: "Changing opponents starts a new round. House rules apply immediately.",
+    settingsHint:
+      "Changing opponents starts a new round. House rules apply immediately.",
     opponents: "Opponents",
-    bot: (n: number) => n === 1 ? "1 Bot" : `${n} Bots`,
+    bot: (n: number) => (n === 1 ? "1 Bot" : `${n} Bots`),
     houseRules: "House rules",
     stack2Label: "Stack +2",
-    stack2Desc: "When hit by a +2, you may play your own +2 – the penalty pile keeps growing.",
+    stack2Desc:
+      "When hit by a +2, you may play your own +2 – the penalty pile keeps growing.",
     drawToMatchLabel: "Draw until you match",
-    drawToMatchDesc: "Instead of one card, you keep drawing until a playable card comes up.",
+    drawToMatchDesc:
+      "Instead of one card, you keep drawing until a playable card comes up.",
     timeLimitLabel: "Turn time limit",
     timeLimitOff: "Off",
-    timeLimitHint: "When time runs out, a card is drawn automatically. Default: no limit.",
+    timeLimitHint:
+      "When time runs out, a card is drawn automatically. Default: no limit.",
     language: "Language",
     sound: "Sound",
     soundOn: "On",
     soundOff: "Off",
     showPlayableLabel: "Highlight playable",
-    showPlayableDesc: "Dims cards that can't be played and highlights those that can.",
+    showPlayableDesc:
+      "Dims cards that can't be played and highlights those that can.",
     close: "Close",
   },
 } as const;
