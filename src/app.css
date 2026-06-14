@@ -1,4 +1,5 @@
 :root {
+  color-scheme: light;
   /* Helles Theme (Standard) – warmes Leinen mit Türkis-Schimmer */
   --bg: #f0ece0;
   --bg-deco: radial-gradient(1100px 520px at 50% -10%, rgba(0, 184, 168, 0.22), transparent 60%);
