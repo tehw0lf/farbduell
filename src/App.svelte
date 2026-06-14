@@ -101,7 +101,7 @@
         toast(t.reversed);
         break;
       case "wishedColor": {
-        toast(t.wishedColor(name(v, ev.player), t.colors[ev.color]));
+        toast(t.wishedColor(name(v, ev.player), isYou(ev.player), t.colors[ev.color]));
         break;
       }
       case "lastCard":

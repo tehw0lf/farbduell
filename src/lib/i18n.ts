@@ -27,10 +27,10 @@ export const TRANSLATIONS = {
       `${name} ${you ? "ziehst" : "zieht"} ${n} Strafkarten`,
     penaltyGrew: (n: number) => `Strafstapel: ${n} Karten`,
     skipped: (name: string, you: boolean) =>
-      `${name} ${you ? "setzt du aus" : "setzt aus"}`,
+      `${name} ${you ? "setzt aus" : "setzt aus"}`,
     reversed: "Richtungswechsel!",
-    wishedColor: (name: string, color: string) =>
-      `${name} wünscht sich ${color}`,
+    wishedColor: (name: string, you: boolean, color: string) =>
+      `${name} ${you ? "wünschst dir" : "wünscht sich"} ${color}`,
     lastCard: (name: string, you: boolean) =>
       `${name} ${you ? "rufst" : "ruft"}: „Letzte Karte!"`,
     reshuffled: "Ablagestapel neu gemischt",
@@ -84,7 +84,7 @@ export const TRANSLATIONS = {
 
     // Modals – end
     youWon: "Gewonnen! 🎉",
-    youWonHint: "Alle Karten abgelegt – ganz ohne Hektik.",
+    youWonHint: "Alle Karten abgelegt.",
     opponentWon: (name: string) => `${name} gewinnt`,
     opponentWonHint: "Nächste Runde läuft's.",
     newRound: "Neue Runde",
@@ -141,7 +141,8 @@ export const TRANSLATIONS = {
     skipped: (name: string, you: boolean) =>
       `${name} ${you ? "are" : "is"} skipped`,
     reversed: "Direction reversed!",
-    wishedColor: (name: string, color: string) => `${name} wishes for ${color}`,
+    wishedColor: (name: string, you: boolean, color: string) =>
+      `${name} ${you ? "wish for" : "wishes for"} ${color}`,
     lastCard: (name: string, you: boolean) =>
       `${name} ${you ? "call" : "calls"}: "Last card!"`,
     reshuffled: "Discard pile reshuffled",
@@ -195,7 +196,7 @@ export const TRANSLATIONS = {
 
     // Modals – end
     youWon: "You won! 🎉",
-    youWonHint: "All cards played – no rush needed.",
+    youWonHint: "All cards played.",
     opponentWon: (name: string) => `${name} wins`,
     opponentWonHint: "Better luck next round.",
     newRound: "New round",

@@ -15,7 +15,7 @@ export interface Settings {
 
 export const DEFAULT_SETTINGS: Settings = {
   botCount: 3,
-  rules: { stack2: false, drawToMatch: false },
+  rules: { stack2: true, drawToMatch: false },
   timeLimit: 0,
   theme: "light",
   lang: "de",
