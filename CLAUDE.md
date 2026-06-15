@@ -19,6 +19,8 @@ npm run check && npm test && npm run build
 
 No lint script exists; `npm run check` covers type errors.
 
+**Before every push:** bump the version in `package.json` (patch for fixes/polish, minor for new features), then run `npm install` to update `package-lock.json`.
+
 ## Architecture
 
 The core design principle: **the UI only knows the `GameAdapter` interface and the censored `PlayerView`**. It is unaware of whether a local engine or a remote server is behind the adapter.

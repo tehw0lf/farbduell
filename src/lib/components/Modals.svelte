@@ -46,6 +46,13 @@
   let endPanel = $state<HTMLElement | null>(null);
   let settingsPanel = $state<HTMLElement | null>(null);
 
+  let shaking = $state<"color" | "drawn" | "end" | "settings" | null>(null);
+
+  function shake(which: "color" | "drawn" | "end" | "settings") {
+    shaking = which;
+    setTimeout(() => (shaking = null), 400);
+  }
+
   $effect(() => {
     if (colorPickCard !== null) focusPanel(colorPanel);
   });
@@ -91,8 +98,9 @@
   aria-labelledby="color-title"
   aria-hidden={colorPickCard === null}
   onkeydown={(e) => { if (e.key === "Escape") oncolorcancel(); trapFocus(e, colorPanel); }}
+  onclick={(e) => { if (e.target === e.currentTarget) shake("color"); }}
 >
-  <div class="panel" bind:this={colorPanel}>
+  <div class="panel" class:shake={shaking === "color"} bind:this={colorPanel}>
     <h2 id="color-title">{t.chooseColor}</h2>
     <p>{t.chooseColorHint}</p>
     <div class="color-grid" role="group" aria-label={t.chooseColor}>
@@ -115,8 +123,9 @@
   aria-labelledby="drawn-title"
   aria-hidden={!drawnOpen}
   onkeydown={(e) => trapFocus(e, drawnPanel)}
+  onclick={(e) => { if (e.target === e.currentTarget) shake("drawn"); }}
 >
-  <div class="panel" bind:this={drawnPanel}>
+  <div class="panel" class:shake={shaking === "drawn"} bind:this={drawnPanel}>
     <h2 id="drawn-title">{t.drawnFits}</h2>
     <p>{t.drawnFitsHint}</p>
     {#if view?.drawnCard}
@@ -138,8 +147,9 @@
   aria-labelledby="end-title"
   aria-hidden={!endOpen}
   onkeydown={(e) => trapFocus(e, endPanel)}
+  onclick={(e) => { if (e.target === e.currentTarget) shake("end"); }}
 >
-  <div class="panel" bind:this={endPanel}>
+  <div class="panel" class:shake={shaking === "end"} bind:this={endPanel}>
     <h2 id="end-title">
       {youWon ? t.youWon : t.opponentWon(view?.players[view.winner ?? 0].name ?? "")}
     </h2>
@@ -159,8 +169,10 @@
   aria-labelledby="settings-title"
   aria-hidden={!settingsOpen}
   onkeydown={(e) => { if (e.key === "Escape") onclosesettings(); trapFocus(e, settingsPanel); }}
+  onclick={(e) => { if (e.target === e.currentTarget) shake("settings"); }}
 >
-  <div class="panel" bind:this={settingsPanel}>
+  <div class="panel settings-panel" class:shake={shaking === "settings"} bind:this={settingsPanel}>
+    <div class="panel-scroll">
     <h2 id="settings-title">{t.settingsTitle}</h2>
     <p>{t.settingsHint}</p>
 
@@ -263,7 +275,10 @@
       </span>
     </button>
 
-    <button class="btn spaced" onclick={onclosesettings}>{t.close}</button>
+    </div>
+    <div class="panel-footer">
+      <button class="btn" onclick={onclosesettings}>{t.close}</button>
+    </div>
   </div>
 </div>
 
@@ -295,6 +310,31 @@
     text-align: center;
     box-shadow: 0 18px 50px rgba(0, 0, 0, 0.5);
   }
+  .settings-panel {
+    display: flex;
+    flex-direction: column;
+    overflow-y: hidden;
+    padding: 0;
+  }
+  .panel-scroll {
+    overflow-y: auto;
+    padding: 24px 22px 8px;
+    flex: 1 1 auto;
+  }
+  .panel-footer {
+    flex: 0 0 auto;
+    padding: 12px 22px 18px;
+    border-top: 1px solid var(--line);
+  }
+  .panel-footer .btn { width: 100%; }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%       { transform: translateX(-8px); }
+    40%       { transform: translateX(8px); }
+    60%       { transform: translateX(-5px); }
+    80%       { transform: translateX(5px); }
+  }
+  .shake { animation: shake 0.4s ease; }
   .panel h2 { font-size: 1.2rem; margin-bottom: 6px; }
   .panel p { font-size: 0.85rem; color: var(--muted); margin-bottom: 16px; }
   .panel p.hint { font-size: 0.72rem; margin: 8px 0 0; }
