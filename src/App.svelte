@@ -7,7 +7,7 @@
   import { TRANSLATIONS } from "./lib/i18n.ts";
   import { isPlayableInView } from "./lib/viewHelpers.ts";
   import { soundPlay, soundDraw, soundLastCard, soundWin, soundLose, soundPenalty } from "./lib/sounds.ts";
-  import Opponents from "./lib/components/Opponents.svelte";
+  import OpponentFan from "./lib/components/OpponentFan.svelte";
   import Table from "./lib/components/Table.svelte";
   import Hand from "./lib/components/Hand.svelte";
   import Modals from "./lib/components/Modals.svelte";
@@ -268,14 +268,45 @@
 
 <main>
   {#if view}
-    <Opponents {view} lang={settings.lang} />
-    <Table {view} nudgeDraw={myTurn && view.phase === "playing" && !anyPlayable} ondraw={onDraw} lang={settings.lang} />
-    <div class="me">
-      <div class="status" role="status" aria-live="polite" aria-atomic="true">{status}</div>
-      {#if timeLeft > 0}
-        <div class="timer" class:urgent={timeLeft <= 5} aria-live="polite" aria-atomic="true">⏱ {timeLeft} s</div>
-      {/if}
-      <Hand {view} onplay={onPlay} lang={settings.lang} showPlayable={settings.showPlayable} />
+    {@const v = view}
+    {@const opponents = v.players
+      .map((p, i) => ({ ...p, idx: i }))
+      .filter((p) => p.idx !== v.you)}
+    <div class="game-layout">
+      <!-- top opponent -->
+      <div class="area-top">
+        {#if opponents.length >= 1}
+          <OpponentFan view={view} lang={settings.lang} position="top" playerIdx={opponents[0].idx} />
+        {/if}
+      </div>
+
+      <!-- middle row: left / table / right -->
+      <div class="area-middle">
+        <div class="area-left">
+          {#if opponents.length >= 2}
+            <OpponentFan view={view} lang={settings.lang} position="left" playerIdx={opponents[1].idx} />
+          {/if}
+        </div>
+
+        <div class="area-center">
+          <Table {view} nudgeDraw={myTurn && view.phase === "playing" && !anyPlayable} ondraw={onDraw} lang={settings.lang} />
+        </div>
+
+        <div class="area-right">
+          {#if opponents.length === 3}
+            <OpponentFan view={view} lang={settings.lang} position="right" playerIdx={opponents[2].idx} />
+          {/if}
+        </div>
+      </div>
+
+      <!-- bottom: player hand -->
+      <div class="me">
+        <div class="status" role="status" aria-live="polite" aria-atomic="true">{status}</div>
+        {#if timeLeft > 0}
+          <div class="timer" class:urgent={timeLeft <= 5} aria-live="polite" aria-atomic="true">⏱ {timeLeft} s</div>
+        {/if}
+        <Hand {view} onplay={onPlay} lang={settings.lang} showPlayable={settings.showPlayable} />
+      </div>
     </div>
   {/if}
 </main>
@@ -340,7 +371,50 @@
   }
   .badge-btn:hover { background: var(--surface-2-h); }
   main {
-    display: contents;
+    flex: 1 1 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .game-layout {
+    flex: 1 1 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 4px 4px 0;
+  }
+  .area-top {
+    flex: 0 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    padding-bottom: 4px;
+  }
+  .area-middle {
+    flex: 1 1 0;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .area-left {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+  .area-center {
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .area-right {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
   }
   .me {
     flex: 0 0 auto;
