@@ -280,6 +280,8 @@
   {/if}
 </main>
 
+<div class="version">v{__APP_VERSION__}</div>
+
 <div
   class="toast"
   class:show={toastVisible}
@@ -390,5 +392,15 @@
     background: var(--koralle);
     color: #fff;
     font-weight: 800;
+  }
+  .version {
+    position: fixed;
+    bottom: 6px;
+    left: 10px;
+    font-size: 0.6rem;
+    color: var(--muted);
+    opacity: 0.4;
+    pointer-events: none;
+    font-variant-numeric: tabular-nums;
   }
 </style>

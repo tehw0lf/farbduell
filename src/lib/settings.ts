@@ -31,8 +31,8 @@ export function loadSettings(): Settings {
     return {
       botCount: [1, 2, 3].includes(raw.botCount) ? raw.botCount : 3,
       rules: {
-        stack2: !!raw.rules?.stack2,
-        drawToMatch: !!raw.rules?.drawToMatch,
+        stack2: raw.rules?.stack2 === undefined ? DEFAULT_SETTINGS.rules.stack2 : !!raw.rules.stack2,
+        drawToMatch: raw.rules?.drawToMatch === undefined ? DEFAULT_SETTINGS.rules.drawToMatch : !!raw.rules.drawToMatch,
       },
       timeLimit: [0, 30, 60, 90].includes(raw.timeLimit) ? raw.timeLimit : 0,
       theme: raw.theme === "dark" ? "dark" : "light",
