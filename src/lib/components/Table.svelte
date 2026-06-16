@@ -16,24 +16,26 @@
 </script>
 
 <div class="table" role="region" aria-label={t.currentColor}>
-  <div class="dir" aria-live="polite" aria-atomic="true">
+  <div class="meta-row" aria-live="polite" aria-atomic="true">
     <span>{t.direction}</span>
     <span class="arrow" style="transform:scaleX({view.dir})" aria-hidden="true">⟳</span>
   </div>
 
-  <div class="pile">
-    <div class="draw-wrap" class:nudge={nudgeDraw}>
-      <Card faceUp={false} playable onclick={ondraw} {lang} aria-label={t.drawPile(view.drawPileCount)} />
+  <div class="piles">
+    <div class="pile">
+      <div class="draw-wrap" class:nudge={nudgeDraw}>
+        <Card faceUp={false} playable onclick={ondraw} {lang} aria-label={t.drawPile(view.drawPileCount)} />
+      </div>
+      <div class="pile-label" aria-hidden="true">{t.drawPile(view.drawPileCount)}</div>
     </div>
-    <div class="pile-label" aria-hidden="true">{t.drawPile(view.drawPileCount)}</div>
+
+    <div class="pile">
+      <Card card={view.topCard} {lang} />
+      <div class="pile-label" aria-hidden="true">{t.discardPile}</div>
+    </div>
   </div>
 
-  <div class="pile">
-    <Card card={view.topCard} {lang} />
-    <div class="pile-label" aria-hidden="true">{t.discardPile}</div>
-  </div>
-
-  <div class="color-now" aria-live="polite" aria-atomic="true">
+  <div class="meta-row" aria-live="polite" aria-atomic="true">
     <span>{t.currentColor}</span>
     <span
       class="color-dot"
@@ -45,13 +47,20 @@
 
 <style>
   .table {
-    flex: 1 1 auto;
+    flex: 1 1 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 6px 0;
+  }
+  .piles {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 26px;
-    position: relative;
-    min-height: 0;
   }
   .pile {
     display: flex;
@@ -65,38 +74,25 @@
     margin-top: 6px;
     font-weight: 600;
   }
-  .dir {
-    position: absolute;
-    top: 8px;
-    left: 50%;
-    transform: translateX(-50%);
+  .meta-row {
     font-size: 0.75rem;
     color: var(--muted);
     display: flex;
     align-items: center;
     gap: 6px;
+    white-space: nowrap;
   }
   .arrow {
     font-size: 1rem;
     transition: transform 0.4s;
     display: inline-block;
   }
-  .color-now {
-    position: absolute;
-    bottom: 8px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.75rem;
-    color: var(--muted);
-  }
   .color-dot {
     width: 16px;
     height: 16px;
     border-radius: 50%;
     border: 2px solid var(--dot-border);
+    flex-shrink: 0;
   }
   .draw-wrap { transition: transform 0.2s; }
   .draw-wrap:hover { transform: translateY(-4px); }

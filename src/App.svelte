@@ -7,7 +7,7 @@
   import { TRANSLATIONS } from "./lib/i18n.ts";
   import { isPlayableInView } from "./lib/viewHelpers.ts";
   import { soundPlay, soundDraw, soundLastCard, soundWin, soundLose, soundPenalty } from "./lib/sounds.ts";
-  import Opponents from "./lib/components/Opponents.svelte";
+  import OpponentFan from "./lib/components/OpponentFan.svelte";
   import Table from "./lib/components/Table.svelte";
   import Hand from "./lib/components/Hand.svelte";
   import Modals from "./lib/components/Modals.svelte";
@@ -268,14 +268,62 @@
 
 <main>
   {#if view}
-    <Opponents {view} lang={settings.lang} />
-    <Table {view} nudgeDraw={myTurn && view.phase === "playing" && !anyPlayable} ondraw={onDraw} lang={settings.lang} />
-    <div class="me">
-      <div class="status" role="status" aria-live="polite" aria-atomic="true">{status}</div>
-      {#if timeLeft > 0}
-        <div class="timer" class:urgent={timeLeft <= 5} aria-live="polite" aria-atomic="true">⏱ {timeLeft} s</div>
-      {/if}
-      <Hand {view} onplay={onPlay} lang={settings.lang} showPlayable={settings.showPlayable} />
+    {@const v = view}
+    {@const seatOrder = v.players
+      .map((p, i) => ({ ...p, idx: i }))
+      .filter((p) => p.idx !== v.you)}
+    <!--
+      Seating runs clockwise around the table: left -> top -> right (the
+      same order turns pass in when dir === 1). Turn order follows
+      view.dir, so when dir is -1 the same seats are walked in reverse.
+    -->
+    {@const seated = v.dir === 1 ? seatOrder : seatOrder.slice().reverse()}
+    {@const seatPositions = (
+      seated.length === 1 ? ["top"]
+      : seated.length === 2 ? ["left", "top"]
+      : ["left", "top", "right"]
+    ) as ("top" | "left" | "right")[]}
+    <div class="game-layout">
+      <!-- top opponent -->
+      <div class="area-top">
+        {#each seated as opp, i (opp.idx)}
+          {#if seatPositions[i] === "top"}
+            <OpponentFan view={view} lang={settings.lang} position="top" playerIdx={opp.idx} />
+          {/if}
+        {/each}
+      </div>
+
+      <!-- middle row: left / table / right -->
+      <div class="area-middle">
+        <div class="area-left">
+          {#each seated as opp, i (opp.idx)}
+            {#if seatPositions[i] === "left"}
+              <OpponentFan view={view} lang={settings.lang} position="left" playerIdx={opp.idx} />
+            {/if}
+          {/each}
+        </div>
+
+        <div class="area-center">
+          <Table {view} nudgeDraw={myTurn && view.phase === "playing" && !anyPlayable} ondraw={onDraw} lang={settings.lang} />
+        </div>
+
+        <div class="area-right">
+          {#each seated as opp, i (opp.idx)}
+            {#if seatPositions[i] === "right"}
+              <OpponentFan view={view} lang={settings.lang} position="right" playerIdx={opp.idx} />
+            {/if}
+          {/each}
+        </div>
+      </div>
+
+      <!-- bottom: player hand -->
+      <div class="me">
+        <div class="status" role="status" aria-live="polite" aria-atomic="true">{status}</div>
+        {#if timeLeft > 0}
+          <div class="timer" class:urgent={timeLeft <= 5} aria-live="polite" aria-atomic="true">⏱ {timeLeft} s</div>
+        {/if}
+        <Hand {view} onplay={onPlay} lang={settings.lang} showPlayable={settings.showPlayable} />
+      </div>
     </div>
   {/if}
 </main>
@@ -340,7 +388,50 @@
   }
   .badge-btn:hover { background: var(--surface-2-h); }
   main {
-    display: contents;
+    flex: 1 1 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .game-layout {
+    flex: 1 1 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 4px 4px 0;
+  }
+  .area-top {
+    flex: 0 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    padding-bottom: 4px;
+  }
+  .area-middle {
+    flex: 1 1 0;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .area-left {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+  .area-center {
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .area-right {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
   }
   .me {
     flex: 0 0 auto;
