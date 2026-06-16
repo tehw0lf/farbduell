@@ -269,23 +269,38 @@
 <main>
   {#if view}
     {@const v = view}
-    {@const opponents = v.players
+    {@const seatOrder = v.players
       .map((p, i) => ({ ...p, idx: i }))
       .filter((p) => p.idx !== v.you)}
+    <!--
+      Seating runs clockwise around the table: left -> top -> right (the
+      same order turns pass in when dir === 1). Turn order follows
+      view.dir, so when dir is -1 the same seats are walked in reverse.
+    -->
+    {@const seated = v.dir === 1 ? seatOrder : seatOrder.slice().reverse()}
+    {@const seatPositions = (
+      seated.length === 1 ? ["top"]
+      : seated.length === 2 ? ["left", "top"]
+      : ["left", "top", "right"]
+    ) as ("top" | "left" | "right")[]}
     <div class="game-layout">
       <!-- top opponent -->
       <div class="area-top">
-        {#if opponents.length >= 1}
-          <OpponentFan view={view} lang={settings.lang} position="top" playerIdx={opponents[0].idx} />
-        {/if}
+        {#each seated as opp, i (opp.idx)}
+          {#if seatPositions[i] === "top"}
+            <OpponentFan view={view} lang={settings.lang} position="top" playerIdx={opp.idx} />
+          {/if}
+        {/each}
       </div>
 
       <!-- middle row: left / table / right -->
       <div class="area-middle">
         <div class="area-left">
-          {#if opponents.length >= 2}
-            <OpponentFan view={view} lang={settings.lang} position="left" playerIdx={opponents[1].idx} />
-          {/if}
+          {#each seated as opp, i (opp.idx)}
+            {#if seatPositions[i] === "left"}
+              <OpponentFan view={view} lang={settings.lang} position="left" playerIdx={opp.idx} />
+            {/if}
+          {/each}
         </div>
 
         <div class="area-center">
@@ -293,9 +308,11 @@
         </div>
 
         <div class="area-right">
-          {#if opponents.length === 3}
-            <OpponentFan view={view} lang={settings.lang} position="right" playerIdx={opponents[2].idx} />
-          {/if}
+          {#each seated as opp, i (opp.idx)}
+            {#if seatPositions[i] === "right"}
+              <OpponentFan view={view} lang={settings.lang} position="right" playerIdx={opp.idx} />
+            {/if}
+          {/each}
         </div>
       </div>
 

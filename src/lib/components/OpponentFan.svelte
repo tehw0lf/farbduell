@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from "svelte";
   import type { PlayerView } from "../engine/types.ts";
   import type { Lang } from "../i18n.ts";
 
@@ -16,10 +17,20 @@
   const MAX_VISIBLE = 8;
   const displayCount = $derived(Math.min(player.cardCount, MAX_VISIBLE));
 
-  const CW = 36;
-  const CH = 54;
+  // Mirrors the --card-w/--card-h breakpoint in app.css
+  let isWide = $state(false);
+  onMount(() => {
+    const mq = matchMedia("(min-width: 600px)");
+    isWide = mq.matches;
+    const onChange = (e: MediaQueryListEvent) => (isWide = e.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  });
+
+  const CW = $derived(isWide ? 64 : 52);
+  const CH = $derived(isWide ? 96 : 78);
   const SPREAD = 44;
-  const PIVOT = 70;
+  const PIVOT = $derived(isWide ? 120 : 100);
 
   const cardTransforms = $derived(
     Array.from({ length: displayCount }, (_, i) => {
@@ -183,5 +194,10 @@
   @keyframes blink {
     0%, 80%, 100% { opacity: 0.25; }
     40% { opacity: 1; }
+  }
+
+  @media (min-width: 600px) {
+    .name { font-size: 0.8rem; max-width: 90px; }
+    .count { font-size: 0.8rem; }
   }
 </style>
