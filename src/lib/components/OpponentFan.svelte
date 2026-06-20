@@ -29,20 +29,24 @@
 
   const CW = $derived(isWide ? 64 : 52);
   const CH = $derived(isWide ? 96 : 78);
-  const SPREAD = 44;
   const PIVOT = $derived(isWide ? 120 : 100);
+
+  // Spread scales with card count so 1-2 cards look natural, 8 stays wide
+  const spread = $derived(Math.min(8, displayCount - 1) * 6);
 
   const cardTransforms = $derived(
     Array.from({ length: displayCount }, (_, i) => {
       const norm = displayCount === 1 ? 0 : (i / (displayCount - 1)) - 0.5;
-      return norm * SPREAD;
+      return norm * spread;
     })
   );
 
-  // Width grows with card count so cards don't overlap too much
-  const fanW = $derived(Math.max(CW + 20, displayCount * 10 + CW + 10));
+  // Geometric width: outermost card tip swings (CH+PIVOT)*sin(spread/2) from center
+  const halfAngle = $derived((spread / 2) * Math.PI / 180);
+  const tipSwing = $derived((CH + PIVOT) * Math.sin(halfAngle));
+  const fanW = $derived(Math.ceil(Math.max(CW + 20, tipSwing * 2 + CW)));
   // Height = card + arc rise
-  const arcRise = $derived(PIVOT * (1 - Math.cos((SPREAD / 2) * Math.PI / 180)));
+  const arcRise = $derived(PIVOT * (1 - Math.cos(halfAngle)));
   const fanH = $derived(Math.ceil(CH + arcRise + 4));
 </script>
 
