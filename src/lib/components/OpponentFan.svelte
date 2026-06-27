@@ -56,7 +56,6 @@
   class:pos-right={position === "right"}
   class:active={isActive}
   title="{player.name}: {player.cardCount} {player.cardCount === 1 ? 'Karte' : 'Karten'}"
-  role="listitem"
   aria-label="{player.name}: {player.cardCount}"
   aria-current={isActive ? "true" : undefined}
 >
