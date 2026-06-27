@@ -96,7 +96,7 @@
   role="dialog"
   aria-modal="true"
   aria-labelledby="color-title"
-  aria-hidden={colorPickCard === null}
+  inert={colorPickCard === null || undefined}
   onkeydown={(e) => { if (e.key === "Escape") oncolorcancel(); trapFocus(e, colorPanel); }}
   onclick={(e) => { if (e.target === e.currentTarget) shake("color"); }}
 >
@@ -121,7 +121,7 @@
   role="dialog"
   aria-modal="true"
   aria-labelledby="drawn-title"
-  aria-hidden={!drawnOpen}
+  inert={!drawnOpen || undefined}
   onkeydown={(e) => trapFocus(e, drawnPanel)}
   onclick={(e) => { if (e.target === e.currentTarget) shake("drawn"); }}
 >
@@ -145,7 +145,7 @@
   role="dialog"
   aria-modal="true"
   aria-labelledby="end-title"
-  aria-hidden={!endOpen}
+  inert={!endOpen || undefined}
   onkeydown={(e) => trapFocus(e, endPanel)}
   onclick={(e) => { if (e.target === e.currentTarget) shake("end"); }}
 >
@@ -167,7 +167,7 @@
   role="dialog"
   aria-modal="true"
   aria-labelledby="settings-title"
-  aria-hidden={!settingsOpen}
+  inert={!settingsOpen || undefined}
   onkeydown={(e) => { if (e.key === "Escape") onclosesettings(); trapFocus(e, settingsPanel); }}
   onclick={(e) => { if (e.target === e.currentTarget) shake("settings"); }}
 >

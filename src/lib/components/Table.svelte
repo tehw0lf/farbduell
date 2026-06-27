@@ -39,6 +39,7 @@
     <span>{t.currentColor}</span>
     <span
       class="color-dot"
+      role="img"
       style="background:var(--{view.color})"
       aria-label={t.colors[view.color]}
     ></span>
