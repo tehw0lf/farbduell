@@ -14,3 +14,7 @@ jobs:
       issues: write
     with:
       target_url: "https://farbduell.tehwolf.de"
+      min_performance: 90
+      min_accessibility: 80
+      min_best_practices: 95
+      min_seo: 85
