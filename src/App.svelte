@@ -152,6 +152,9 @@
 
   function onDraw() {
     if (!view || !myTurn || view.phase !== "playing") return;
+    // Bei offener Null-Forderung mit eigener 0 lehnt die Engine das Ziehen ab –
+    // hier gar nicht erst senden, sonst gaebe es nur einen Fehler-Toast.
+    if (view.pendingZero && anyPlayable) return;
     adapter.dispatch({ type: "draw" });
   }
 
@@ -241,6 +244,15 @@
   function onTimeout() {
     if (!view || view.turn !== view.you || view.phase !== "playing") return;
     toast(t.timeout);
+    // Bei offener Null-Forderung ist Ziehen nur ohne eigene 0 erlaubt –
+    // sonst muss automatisch eine 0 gelegt werden, statt in einen Fehler zu laufen.
+    if (view.pendingZero) {
+      const zero = view.yourHand.find((c) => isPlayableInView(view!, c));
+      if (zero) {
+        adapter.dispatch({ type: "play", cardId: zero.id });
+        return;
+      }
+    }
     adapter.dispatch({ type: "draw" });
     // view is reactive – re-read after dispatch to check updated phase
     const after = view;
