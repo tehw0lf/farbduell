@@ -93,14 +93,20 @@
 <div
   class="overlay"
   class:show={colorPickCard !== null}
-  role="dialog"
-  aria-modal="true"
-  aria-labelledby="color-title"
+  role="presentation"
   inert={colorPickCard === null || undefined}
   onkeydown={(e) => { if (e.key === "Escape") oncolorcancel(); trapFocus(e, colorPanel); }}
   onclick={(e) => { if (e.target === e.currentTarget) shake("color"); }}
 >
-  <div class="panel" class:shake={shaking === "color"} bind:this={colorPanel}>
+  <div
+    class="panel"
+    class:shake={shaking === "color"}
+    bind:this={colorPanel}
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="color-title"
+    tabindex="-1"
+  >
     <h2 id="color-title">{t.chooseColor}</h2>
     <p>{t.chooseColorHint}</p>
     <div class="color-grid" role="group" aria-label={t.chooseColor}>
@@ -118,14 +124,20 @@
 <div
   class="overlay"
   class:show={drawnOpen}
-  role="dialog"
-  aria-modal="true"
-  aria-labelledby="drawn-title"
+  role="presentation"
   inert={!drawnOpen || undefined}
   onkeydown={(e) => trapFocus(e, drawnPanel)}
   onclick={(e) => { if (e.target === e.currentTarget) shake("drawn"); }}
 >
-  <div class="panel" class:shake={shaking === "drawn"} bind:this={drawnPanel}>
+  <div
+    class="panel"
+    class:shake={shaking === "drawn"}
+    bind:this={drawnPanel}
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="drawn-title"
+    tabindex="-1"
+  >
     <h2 id="drawn-title">{t.drawnFits}</h2>
     <p>{t.drawnFitsHint}</p>
     {#if view?.drawnCard}
@@ -142,14 +154,20 @@
 <div
   class="overlay"
   class:show={endOpen}
-  role="dialog"
-  aria-modal="true"
-  aria-labelledby="end-title"
+  role="presentation"
   inert={!endOpen || undefined}
   onkeydown={(e) => trapFocus(e, endPanel)}
   onclick={(e) => { if (e.target === e.currentTarget) shake("end"); }}
 >
-  <div class="panel" class:shake={shaking === "end"} bind:this={endPanel}>
+  <div
+    class="panel"
+    class:shake={shaking === "end"}
+    bind:this={endPanel}
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="end-title"
+    tabindex="-1"
+  >
     <h2 id="end-title">
       {youWon ? t.youWon : t.opponentWon(view?.players[view.winner ?? 0].name ?? "")}
     </h2>
@@ -164,14 +182,20 @@
 <div
   class="overlay"
   class:show={settingsOpen}
-  role="dialog"
-  aria-modal="true"
-  aria-labelledby="settings-title"
+  role="presentation"
   inert={!settingsOpen || undefined}
   onkeydown={(e) => { if (e.key === "Escape") onclosesettings(); trapFocus(e, settingsPanel); }}
   onclick={(e) => { if (e.target === e.currentTarget) shake("settings"); }}
 >
-  <div class="panel settings-panel" class:shake={shaking === "settings"} bind:this={settingsPanel}>
+  <div
+    class="panel settings-panel"
+    class:shake={shaking === "settings"}
+    bind:this={settingsPanel}
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="settings-title"
+    tabindex="-1"
+  >
     <div class="panel-scroll">
     <h2 id="settings-title">{t.settingsTitle}</h2>
     <p>{t.settingsHint}</p>
@@ -193,7 +217,7 @@
     <div class="set-label">{t.houseRules}</div>
 
     <div class="set-sublabel" id="stackmode-label">{t.stackLabel}</div>
-    <div class="btn-row" role="group" aria-labelledby="stackmode-label">
+    <div class="btn-grid" role="group" aria-labelledby="stackmode-label">
       {#each STACK_MODES as mode (mode)}
         <button
           class="btn"
@@ -370,6 +394,13 @@
   }
   .color-grid button:hover { transform: scale(1.04); }
   .btn-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  /* Gleich breite Optionen statt ungleichmaessigem Flex-Umbruch (4 Modi = 2x2) */
+  .btn-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .btn-grid .btn { width: 100%; }
   .spaced { margin-top: 14px; }
   .drawn-slot { display: grid; place-items: center; margin-bottom: 16px; }
   .set-label {
