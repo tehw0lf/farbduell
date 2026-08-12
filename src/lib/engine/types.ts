@@ -20,11 +20,31 @@ export interface Card {
   value: Value;
 }
 
+/**
+ * Wie Strafkarten weitergereicht werden dürfen. Ein Modus statt mehrerer
+ * Booleans, weil sich die Varianten gegenseitig ausschließen – ungültige
+ * Kombinationen sind so gar nicht erst darstellbar.
+ *
+ * - `off`   – kein Stapeln: das Ziel zieht sofort und setzt aus
+ * - `two`   – nur +2 kontert +2; +4 zieht immer sofort
+ * - `free`  – +2 und +4 sind frei mischbar, jede kontert jede
+ * - `trump` – gleich oder höher: +2 kontert nur reine +2-Stapel,
+ *             +4 kontert alles. Nach einem +4 ist die +2 raus.
+ */
+export type StackMode = "off" | "two" | "free" | "trump";
+
+export const STACK_MODES = ["off", "two", "free", "trump"] as const;
+
+/** Welche Kartenart den Strafstapel zuletzt bedient hat (für `trump`). */
+export type DrawKind = "none" | "draw2" | "wild4";
+
 export interface Rules {
-  /** +2 darf mit eigener +2 gekontert werden; Strafstapel wächst */
-  stack2: boolean;
+  /** Umgang mit +2/+4-Strafstapeln */
+  stackMode: StackMode;
   /** statt 1 Karte wird gezogen, bis eine passt */
   drawToMatch: boolean;
+  /** nach einer 0 muss der Nächste eine 0 legen – sonst zieht er eine Karte */
+  zeroChain: boolean;
 }
 
 export interface Player {
@@ -45,8 +65,16 @@ export interface GameState {
   dir: 1 | -1;
   /** Index des Spielers am Zug */
   turn: number;
-  /** angesammelte Strafkarten (Hausregel stack2) */
+  /** angesammelte Strafkarten (abhängig von rules.stackMode) */
   pendingDraw: number;
+  /**
+   * Höchste Kartenart im offenen Strafstapel. Nur `pendingDraw` würde nicht
+   * reichen: 6 kann +2→+4 oder +4→+2 sein, und im Modus `trump` darf nur im
+   * zweiten Fall noch eine +2 folgen.
+   */
+  pendingDrawKind: DrawKind;
+  /** offene Null-Forderung (Hausregel zeroChain): der Zugspieler muss eine 0 legen */
+  pendingZero: boolean;
   phase: Phase;
   /** nur in Phase drawnDecision: id der frisch gezogenen, spielbaren Karte */
   drawnCardId: number | null;
@@ -71,6 +99,8 @@ export type GameEvent =
   | { kind: "drew"; player: number; count: number }
   | { kind: "drewPenalty"; player: number; count: number }
   | { kind: "penaltyGrew"; total: number }
+  | { kind: "zeroDemanded"; player: number }
+  | { kind: "zeroMissed"; player: number }
   | { kind: "skipped"; player: number }
   | { kind: "reversed"; playAgain: boolean }
   | { kind: "wishedColor"; player: number; color: Color }
@@ -90,6 +120,10 @@ export interface PlayerView {
   turn: number;
   phase: Phase;
   pendingDraw: number;
+  /** höchste Kartenart im offenen Strafstapel (relevant im Modus `trump`) */
+  pendingDrawKind: DrawKind;
+  /** offene Null-Forderung an den Spieler am Zug */
+  pendingZero: boolean;
   /** nur gesetzt, wenn DU in drawnDecision steckst */
   drawnCard: Card | null;
   drawPileCount: number;

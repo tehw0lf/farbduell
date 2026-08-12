@@ -1,7 +1,7 @@
 <script lang="ts">
   import { tick } from "svelte";
   import type { Card as CardT, Color, PlayerView } from "../engine/types.ts";
-  import { COLORS } from "../engine/types.ts";
+  import { COLORS, STACK_MODES } from "../engine/types.ts";
   import type { Settings } from "../settings.ts";
   import type { Lang } from "../i18n.ts";
   import { TRANSLATIONS } from "../i18n.ts";
@@ -191,16 +191,32 @@
     </div>
 
     <div class="set-label">{t.houseRules}</div>
+
+    <div class="set-sublabel" id="stackmode-label">{t.stackLabel}</div>
+    <div class="btn-row" role="group" aria-labelledby="stackmode-label">
+      {#each STACK_MODES as mode (mode)}
+        <button
+          class="btn"
+          class:active={settings.rules.stackMode === mode}
+          aria-pressed={settings.rules.stackMode === mode}
+          onclick={() => onsettings({ rules: { ...settings.rules, stackMode: mode } })}
+        >
+          {t.stackModeNames[mode]}
+        </button>
+      {/each}
+    </div>
+    <p class="rule-hint">{t.stackModeDescs[settings.rules.stackMode]}</p>
+
     <button
       class="rule"
-      class:on={settings.rules.stack2}
-      aria-pressed={settings.rules.stack2}
-      onclick={() => onsettings({ rules: { ...settings.rules, stack2: !settings.rules.stack2 } })}
+      class:on={settings.rules.zeroChain}
+      aria-pressed={settings.rules.zeroChain}
+      onclick={() => onsettings({ rules: { ...settings.rules, zeroChain: !settings.rules.zeroChain } })}
     >
       <span class="rule-check" aria-hidden="true"></span>
       <span class="rule-text">
-        <strong>{t.stack2Label}</strong>
-        {t.stack2Desc}
+        <strong>{t.zeroChainLabel}</strong>
+        {t.zeroChainDesc}
       </span>
     </button>
     <button
@@ -364,6 +380,20 @@
     text-transform: uppercase;
     letter-spacing: 0.08em;
     margin: 16px 0 8px;
+  }
+  .set-sublabel {
+    text-align: left;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--muted);
+    margin: 10px 0 8px;
+  }
+  .rule-hint {
+    text-align: left;
+    font-size: 0.78rem;
+    line-height: 1.4;
+    color: var(--muted);
+    margin: 8px 0 4px;
   }
   .rule {
     display: flex;

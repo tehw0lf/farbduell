@@ -5,6 +5,7 @@ import { playerView } from "../engine/view.ts";
 import { chooseBotAction } from "../engine/bot.ts";
 import type { DispatchAction, GameAdapter, NewGameOptions } from "./types.ts";
 import { TRANSLATIONS } from "../i18n.ts";
+import { migrateStackMode } from "../settings.ts";
 
 const HUMAN = 0;
 const PERSIST_KEY = "farbduell-gamestate";
@@ -19,7 +20,16 @@ function loadState(): GameState | null {
   try {
     const raw = localStorage.getItem(PERSIST_KEY);
     if (!raw) return null;
-    return JSON.parse(raw) as GameState;
+    const state = JSON.parse(raw) as GameState;
+    // Spielstände aus älteren Versionen kennen die neuen Felder nicht.
+    state.pendingZero = state.pendingZero ?? false;
+    state.pendingDrawKind = state.pendingDrawKind ?? (state.pendingDraw > 0 ? "draw2" : "none");
+    state.rules = {
+      ...state.rules,
+      stackMode: migrateStackMode(state.rules),
+      zeroChain: state.rules?.zeroChain ?? false,
+    };
+    return state;
   } catch {
     return null;
   }
@@ -86,8 +96,18 @@ export class LocalAdapter implements GameAdapter {
     if (!this.state) return;
     this.state = structuredClone(this.state);
     this.state.rules = { ...rules };
-    // Abschalten der Stapel-Regel lässt einen offenen Strafstapel verfallen
-    if (!rules.stack2) this.state.pendingDraw = 0;
+    // Abschalten einer Regel lässt den zugehörigen offenen Zustand verfallen,
+    // sonst bliebe eine Forderung stehen, die niemand mehr erfüllen kann.
+    // Auch der Wechsel auf "two" entwertet einen Stapel, in dem ein +4 liegt –
+    // den könnte danach niemand mehr kontern.
+    if (
+      rules.stackMode === "off" ||
+      (rules.stackMode === "two" && this.state.pendingDrawKind === "wild4")
+    ) {
+      this.state.pendingDraw = 0;
+      this.state.pendingDrawKind = "none";
+    }
+    if (!rules.zeroChain) this.state.pendingZero = false;
     this.state.events = [];
     this.emit();
   }

@@ -32,6 +32,7 @@ Pure reducer with no DOM, no timers, no side effects. The RNG state (`mulberry32
 - **`types.ts`** – all shared types: `Card`, `GameState`, `Action`, `GameEvent`, `PlayerView`, `Rules`, `EngineError`
 - **`deck.ts`** – builds the 108-card deck; `shuffle()` takes and returns the RNG seed
 - **`engine.ts`** – `createGame()` and `reduce(state, action) → state`; throws `EngineError` on illegal moves
+- **`playable.ts`** – `canPlay(ctx, card)`: the single source of truth for legality. Engine, bot and UI all derive from it, so the rule cannot drift between them. `stacks(rules, value)` answers whether a card feeds the penalty pile in the current `stackMode`
 - **`view.ts`** – `playerView(state, i)`: produces a `PlayerView` for player `i` with all opponents' hands hidden (only `cardCount` exposed)
 - **`bot.ts`** – bot heuristic operating purely on `PlayerView`
 
@@ -50,7 +51,9 @@ The engine is designed for a future `RemoteAdapter` (WebSocket). The server woul
 
 ## Adding house rules
 
-1. Add a field to `Rules` in [src/lib/engine/types.ts](src/lib/engine/types.ts)
-2. Implement the logic in [src/lib/engine/engine.ts](src/lib/engine/engine.ts)
-3. Write tests in [tests/engine.test.ts](tests/engine.test.ts)
-4. Add a toggle in [src/lib/components/Modals.svelte](src/lib/components/Modals.svelte) and [src/lib/settings.ts](src/lib/settings.ts)
+1. Add a field to `Rules` in [src/lib/engine/types.ts](src/lib/engine/types.ts). If the variants are mutually exclusive, model them as a union type (like `StackMode`) rather than several booleans — invalid combinations then cannot be represented at all
+2. If the rule changes which cards are legal, put that in `canPlay()` in [src/lib/engine/playable.ts](src/lib/engine/playable.ts) — never inline it in the engine, bot or UI
+3. Implement the turn effects in [src/lib/engine/engine.ts](src/lib/engine/engine.ts)
+4. Write tests in [tests/engine.test.ts](tests/engine.test.ts) and add the rule to the mass-simulation cross product
+5. Add a toggle in [src/lib/components/Modals.svelte](src/lib/components/Modals.svelte) and [src/lib/settings.ts](src/lib/settings.ts), plus strings in [src/lib/i18n.ts](src/lib/i18n.ts)
+6. If the rule adds state to `GameState`, migrate persisted saves in [src/lib/adapter/local.ts](src/lib/adapter/local.ts)
