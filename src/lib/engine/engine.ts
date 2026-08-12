@@ -12,6 +12,7 @@ import type {
 } from "./types.ts";
 import { EngineError } from "./types.ts";
 import { buildDeck, shuffle } from "./deck.ts";
+import { canPlay, stacks } from "./playable.ts";
 
 export interface CreateGameOptions {
   /** Spielernamen in Sitzreihenfolge; isBot parallel dazu */
@@ -57,6 +58,8 @@ export function createGame(opts: CreateGameOptions): GameState {
     dir: 1,
     turn: 0,
     pendingDraw: 0,
+    pendingDrawKind: "none",
+    pendingZero: false,
     phase: "playing",
     drawnCardId: null,
     winner: null,
@@ -73,9 +76,17 @@ export function topCard(s: GameState): Card {
 }
 
 export function isPlayable(s: GameState, card: Card): boolean {
-  if (s.pendingDraw > 0) return card.value === "draw2"; // nur Kontern
-  if (card.value === "wild" || card.value === "wild4") return true;
-  return card.color === s.color || card.value === topCard(s).value;
+  return canPlay(
+    {
+      topCard: topCard(s),
+      color: s.color,
+      pendingDraw: s.pendingDraw,
+      pendingDrawKind: s.pendingDrawKind,
+      pendingZero: s.pendingZero,
+      rules: s.rules,
+    },
+    card,
+  );
 }
 
 export function nextIdx(s: GameState, from: number, steps: number): number {
@@ -120,8 +131,17 @@ function applyCard(s: GameState, player: number, card: Card, chosenColor?: Color
   s.events.push({ kind: "played", player, card });
 
   let skips = 1; // normal: der Nächste ist dran
+  // Eine gelegte Karte erfüllt jede offene Null-Forderung; eine neue 0 stellt sie neu.
+  s.pendingZero = false;
 
   switch (card.value) {
+    case "0": {
+      if (s.rules.zeroChain) {
+        s.pendingZero = true;
+        s.events.push({ kind: "zeroDemanded", player: nextIdx(s, player, 1) });
+      }
+      break;
+    }
     case "reverse": {
       s.dir = s.dir === 1 ? -1 : 1;
       const playAgain = s.players.length === 2; // 2-Spieler-Regel: wirkt wie Aussetzen
@@ -135,8 +155,10 @@ function applyCard(s: GameState, player: number, card: Card, chosenColor?: Color
       break;
     }
     case "draw2": {
-      if (s.rules.stack2) {
+      if (stacks(s.rules, "draw2")) {
         s.pendingDraw += 2;
+        // Eine +2 senkt den Rang nie: ein liegendes +4 bleibt maßgeblich.
+        if (s.pendingDrawKind === "none") s.pendingDrawKind = "draw2";
         s.events.push({ kind: "penaltyGrew", total: s.pendingDraw });
         skips = 1; // der Nächste darf kontern
       } else {
@@ -148,11 +170,18 @@ function applyCard(s: GameState, player: number, card: Card, chosenColor?: Color
       break;
     }
     case "wild4": {
-      const target = nextIdx(s, player, 1);
-      const n = drawMany(s, target, 4);
-      s.events.push({ kind: "drewPenalty", player: target, count: n });
       s.events.push({ kind: "wishedColor", player, color: s.color });
-      skips = 2;
+      if (stacks(s.rules, "wild4")) {
+        s.pendingDraw += 4;
+        s.pendingDrawKind = "wild4"; // ab jetzt kontert nur noch +4 (Modus trump)
+        s.events.push({ kind: "penaltyGrew", total: s.pendingDraw });
+        skips = 1; // der Nächste darf kontern
+      } else {
+        const target = nextIdx(s, player, 1);
+        const n = drawMany(s, target, 4);
+        s.events.push({ kind: "drewPenalty", player: target, count: n });
+        skips = 2;
+      }
       break;
     }
     case "wild": {
@@ -210,7 +239,19 @@ export function reduce(state: GameState, action: Action): GameState {
       if (s.pendingDraw > 0) {
         const n = drawMany(s, action.player, s.pendingDraw);
         s.pendingDraw = 0;
+        s.pendingDrawKind = "none";
         s.events.push({ kind: "drewPenalty", player: action.player, count: n });
+        s.turn = nextIdx(s, action.player, 1);
+        return s;
+      }
+
+      // Offene Null-Forderung: genau eine Karte ziehen, Zug endet.
+      // Die gezogene Karte darf nicht sofort gelegt werden – die Kette bricht.
+      if (s.pendingZero) {
+        drawMany(s, action.player, 1);
+        s.pendingZero = false;
+        // zeroMissed ersetzt hier das generische drew-Event – eine Meldung genügt.
+        s.events.push({ kind: "zeroMissed", player: action.player });
         s.turn = nextIdx(s, action.player, 1);
         return s;
       }

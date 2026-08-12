@@ -1,5 +1,6 @@
 import type { Action, Card, Color, PlayerView } from "./types.ts";
 import { COLORS } from "./types.ts";
+import { canPlay } from "./playable.ts";
 
 /**
  * Wählt den nächsten Zug eines Bots – ausschließlich auf Basis seiner
@@ -19,17 +20,30 @@ export function chooseBotAction(view: PlayerView, rand: () => number = Math.rand
     };
   }
 
-  const playable = view.yourHand.filter((c) => isPlayableInView(view, c));
+  const playable = view.yourHand.filter((c) => canPlay(view, c));
 
-  // Strafstapel: kontern, wenn möglich – sonst ziehen
+  // Strafstapel: kontern, wenn möglich – sonst ziehen. Bevorzugt die billigste
+  // Konterkarte, damit ein +4 als Trumpf in der Hand bleibt. `playable` ist
+  // bereits modusgefiltert: liegt im Modus `trump` ein +4, ist hier keine +2 mehr drin.
   if (view.pendingDraw > 0) {
-    const counter = playable[0];
+    const counter =
+      playable.find((c) => c.value === "draw2") ?? playable[0];
     return counter
-      ? { type: "play", player: me, cardId: counter.id }
+      ? {
+          type: "play",
+          player: me,
+          cardId: counter.id,
+          chosenColor: counter.color === null ? pickColor(view.yourHand, rand) : undefined,
+        }
       : { type: "draw", player: me };
   }
 
   if (playable.length === 0) return { type: "draw", player: me };
+
+  // Offene Null-Forderung: nur Nullen sind spielbar, Farbwahl entfällt.
+  if (view.pendingZero) {
+    return { type: "play", player: me, cardId: pick(playable, rand).id };
+  }
 
   const nonWild = playable.filter((c) => c.value !== "wild" && c.value !== "wild4");
   const nextPlayer = view.players[mod(me + view.dir, view.players.length)];
@@ -54,12 +68,6 @@ export function chooseBotAction(view: PlayerView, rand: () => number = Math.rand
 }
 
 /* ---------- Helfer ---------- */
-
-function isPlayableInView(view: PlayerView, card: Card): boolean {
-  if (view.pendingDraw > 0) return card.value === "draw2";
-  if (card.value === "wild" || card.value === "wild4") return true;
-  return card.color === view.color || card.value === view.topCard.value;
-}
 
 function pickColor(hand: Card[], rand: () => number): Color {
   const count: Record<Color, number> = { koralle: 0, gold: 0, tuerkis: 0, lila: 0 };

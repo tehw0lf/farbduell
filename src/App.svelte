@@ -68,6 +68,9 @@
         ? t.penaltyStackPlayable(view.pendingDraw)
         : t.penaltyStackDraw(view.pendingDraw);
     }
+    if (view.pendingZero) {
+      return anyPlayable ? t.zeroDemandPlayable : t.zeroDemandDraw;
+    }
     return anyPlayable ? t.yourTurn : t.drawCard;
   });
 
@@ -93,6 +96,13 @@
         break;
       case "penaltyGrew":
         toast(t.penaltyGrew(ev.total));
+        break;
+      case "zeroDemanded":
+        toast(t.zeroDemanded(name(v, ev.player), isYou(ev.player)));
+        break;
+      case "zeroMissed":
+        toast(t.zeroMissed(name(v, ev.player), isYou(ev.player)));
+        if (isYou(ev.player)) sound(soundDraw);
         break;
       case "skipped":
         toast(t.skipped(name(v, ev.player), isYou(ev.player)));

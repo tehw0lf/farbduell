@@ -14,9 +14,11 @@ export const TRANSLATIONS = {
     thinking: (name: string) => `${name} überlegt …`,
     yourDecision: "Deine Entscheidung.",
     penaltyStackPlayable: (n: number) =>
-      `Strafstapel: ${n} Karten – leg eine +2 drauf oder zieh sie.`,
+      `Strafstapel: ${n} Karten – kontere oder zieh sie.`,
     penaltyStackDraw: (n: number) =>
-      `Keine +2 auf der Hand – zieh die ${n} Strafkarten.`,
+      `Nichts zum Kontern – zieh die ${n} Strafkarten.`,
+    zeroDemandPlayable: "Null gelegt – leg eine 0 drauf.",
+    zeroDemandDraw: "Keine 0 auf der Hand – zieh eine Karte.",
     yourTurn: "Du bist dran.",
     drawCard: "Nichts passt – zieh.",
 
@@ -26,6 +28,10 @@ export const TRANSLATIONS = {
     drewPenalty: (name: string, you: boolean, n: number) =>
       `${name} ${you ? "ziehst" : "zieht"} ${n} Strafkarten`,
     penaltyGrew: (n: number) => `Strafstapel: ${n} Karten`,
+    zeroDemanded: (name: string, you: boolean) =>
+      `${name} ${you ? "musst" : "muss"} eine 0 legen`,
+    zeroMissed: (name: string, you: boolean) =>
+      `${name} ${you ? "hast" : "hat"} keine 0 – eine Karte gezogen`,
     skipped: (name: string, you: boolean) =>
       `${name} ${you ? "setzt aus" : "setzt aus"}`,
     reversed: "Richtungswechsel!",
@@ -96,9 +102,23 @@ export const TRANSLATIONS = {
     opponents: "Mitspieler",
     bot: (n: number) => (n === 1 ? "1 Bot" : `${n} Bots`),
     houseRules: "Hausregeln",
-    stack2Label: "+2 stapeln",
-    stack2Desc:
-      "Wer eine +2 bekommt, darf eine eigene +2 drauflegen – der Strafstapel wandert weiter.",
+    stackLabel: "Strafstapel",
+    stackModeNames: {
+      off: "Aus",
+      two: "Nur +2",
+      free: "Frei",
+      trump: "+4 Trumpf",
+    } as Record<string, string>,
+    stackModeDescs: {
+      off: "Kein Stapeln – wer eine +2 oder +4 bekommt, zieht sofort und setzt aus.",
+      two: "+2 kontert +2, der Strafstapel wandert weiter. Eine +4 zieht sofort.",
+      free: "+2 und +4 sind frei mischbar, jede kontert jede – der Stapel kann kräftig wachsen.",
+      trump:
+        "Gleich oder höher: +2 kontert nur reine +2-Stapel, +4 kontert alles. Nach einer +4 ist die +2 raus.",
+    } as Record<string, string>,
+    zeroChainLabel: "Null-Kette",
+    zeroChainDesc:
+      "Nach einer 0 muss der Nächste ebenfalls eine 0 legen – sonst zieht er eine Karte.",
     drawToMatchLabel: "Ziehen, bis es passt",
     drawToMatchDesc:
       "Statt einer Karte ziehst du so lange, bis eine passende kommt.",
@@ -126,9 +146,11 @@ export const TRANSLATIONS = {
     thinking: (name: string) => `${name} is thinking …`,
     yourDecision: "Your decision.",
     penaltyStackPlayable: (n: number) =>
-      `Penalty stack: ${n} cards – play a +2 or draw them.`,
+      `Penalty stack: ${n} cards – counter it or draw them.`,
     penaltyStackDraw: (n: number) =>
-      `No +2 in hand – draw the ${n} penalty cards.`,
+      `Nothing to counter with – draw the ${n} penalty cards.`,
+    zeroDemandPlayable: "Zero played – put a 0 on top.",
+    zeroDemandDraw: "No 0 in hand – draw a card.",
     yourTurn: "Your turn.",
     drawCard: "Nothing fits – draw.",
 
@@ -138,6 +160,10 @@ export const TRANSLATIONS = {
     drewPenalty: (name: string, you: boolean, n: number) =>
       `${name} ${you ? "draw" : "draws"} ${n} penalty card${n === 1 ? "" : "s"}`,
     penaltyGrew: (n: number) => `Penalty stack: ${n} cards`,
+    zeroDemanded: (name: string, you: boolean) =>
+      `${name} ${you ? "must" : "has to"} play a 0`,
+    zeroMissed: (name: string, you: boolean) =>
+      `${name} ${you ? "have" : "has"} no 0 – drew a card`,
     skipped: (name: string, you: boolean) =>
       `${name} ${you ? "are" : "is"} skipped`,
     reversed: "Direction reversed!",
@@ -208,9 +234,23 @@ export const TRANSLATIONS = {
     opponents: "Opponents",
     bot: (n: number) => (n === 1 ? "1 Bot" : `${n} Bots`),
     houseRules: "House rules",
-    stack2Label: "Stack +2",
-    stack2Desc:
-      "When hit by a +2, you may play your own +2 – the penalty pile keeps growing.",
+    stackLabel: "Penalty stack",
+    stackModeNames: {
+      off: "Off",
+      two: "+2 only",
+      free: "Free",
+      trump: "+4 trumps",
+    } as Record<string, string>,
+    stackModeDescs: {
+      off: "No stacking – whoever is hit by a +2 or +4 draws immediately and is skipped.",
+      two: "+2 counters +2 and the penalty pile keeps moving. A +4 draws immediately.",
+      free: "+2 and +4 mix freely, each counters the other – the pile can grow fast.",
+      trump:
+        "Equal or higher: +2 only counters pure +2 piles, +4 counters everything. After a +4 the +2 is out.",
+    } as Record<string, string>,
+    zeroChainLabel: "Zero chain",
+    zeroChainDesc:
+      "After a 0, the next player must play a 0 as well – otherwise they draw a card.",
     drawToMatchLabel: "Draw until you match",
     drawToMatchDesc:
       "Instead of one card, you keep drawing until a playable card comes up.",

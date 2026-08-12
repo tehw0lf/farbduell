@@ -22,6 +22,8 @@ export function playerView(s: GameState, you: number): PlayerView {
     turn: s.turn,
     phase: s.phase,
     pendingDraw: s.pendingDraw,
+    pendingDrawKind: s.pendingDrawKind,
+    pendingZero: s.pendingZero,
     drawnCard:
       s.phase === "drawnDecision" && s.turn === you
         ? structuredClone(me.hand.find((c) => c.id === s.drawnCardId) ?? null)
