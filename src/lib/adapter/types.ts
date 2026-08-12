@@ -1,4 +1,4 @@
-import type { Action, PlayerView, Rules } from "../engine/types.ts";
+import type { Action, EngineErrorCode, PlayerView, Rules } from "../engine/types.ts";
 
 /** Each Action variant with the "player" field removed. */
 export type DispatchAction =
@@ -24,7 +24,12 @@ export interface GameAdapter {
   setRules(rules: Rules): void;
   /** Aufräumen (Timer, Sockets) */
   destroy(): void;
-  onError?: (message: string) => void;
+  /**
+   * Regelverstoß des lokalen Spielers. Übergeben wird der sprachfreie Code –
+   * die Übersetzung passiert in der UI. Ein RemoteAdapter kann denselben Code
+   * unverändert über die Leitung schicken.
+   */
+  onError?: (code: EngineErrorCode) => void;
 }
 
 export interface NewGameOptions {

@@ -32,6 +32,9 @@ Pure reducer with no DOM, no timers, no side effects. The RNG state (`mulberry32
 - **`types.ts`** – all shared types: `Card`, `GameState`, `Action`, `GameEvent`, `PlayerView`, `Rules`, `EngineError`
 - **`deck.ts`** – builds the 108-card deck; `shuffle()` takes and returns the RNG seed
 - **`engine.ts`** – `createGame()` and `reduce(state, action) → state`; throws `EngineError` on illegal moves
+
+**The engine is language-free.** `EngineError` carries a stable `code` (`EngineErrorCode`) plus an English developer message for logs. The UI maps the code to a translated string via `t.errors[code]`; a future server can send the same code over the wire without knowing the client's language. When adding a rule violation: add the code to `ENGINE_ERROR_CODES`, throw it with an English message, and add texts to **both** language blocks in `i18n.ts` — a test asserts every code is translated everywhere.
+
 - **`playable.ts`** – `canPlay(ctx, card)`: the single source of truth for legality. Engine, bot and UI all derive from it, so the rule cannot drift between them. `stacks(rules, value)` answers whether a card feeds the penalty pile in the current `stackMode`
 - **`view.ts`** – `playerView(state, i)`: produces a `PlayerView` for player `i` with all opponents' hands hidden (only `cardCount` exposed)
 - **`bot.ts`** – bot heuristic operating purely on `PlayerView`

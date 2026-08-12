@@ -111,11 +111,46 @@ test("isPlayable: Farbe, Wert, Wunschkarten", () => {
   assert.ok(!isPlayable(s, { id: 903, color: other, value: t.value === "9" ? "8" : "9" }));
 });
 
-test("ungültige Aktionen werfen EngineError", () => {
+test("ungültige Aktionen werfen EngineError mit passendem Code", () => {
   const s = game(4);
-  assert.throws(() => reduce(s, { type: "play", player: 1, cardId: 1 }), EngineError);
-  assert.throws(() => reduce(s, { type: "keepDrawn", player: 0 }), EngineError);
-  assert.throws(() => reduce(s, { type: "play", player: 0, cardId: -1 }), EngineError);
+  assert.throws(() => reduce(s, { type: "play", player: 1, cardId: 1 }),
+    (e: EngineError) => e instanceof EngineError && e.code === "notYourTurn");
+  assert.throws(() => reduce(s, { type: "keepDrawn", player: 0 }),
+    (e: EngineError) => e instanceof EngineError && e.code === "noDrawnCard");
+  assert.throws(() => reduce(s, { type: "play", player: 0, cardId: -1 }),
+    (e: EngineError) => e instanceof EngineError && e.code === "cardNotInHand");
+
+  // Zug auf eine beendete Runde
+  const done = { ...structuredClone(s), phase: "finished" as const };
+  assert.throws(() => reduce(done, { type: "draw", player: 0 }),
+    (e: EngineError) => e instanceof EngineError && e.code === "roundOver");
+
+  // Spielerzahl ausserhalb 2..10
+  assert.throws(
+    () => createGame({ names: ["Allein"], bots: [false], rules: NO_RULES, seed: 1 }),
+    (e: EngineError) => e instanceof EngineError && e.code === "playerCount",
+  );
+});
+
+test("EngineError trägt eine englische Entwickler-Message", () => {
+  // Die Engine bleibt sprachfrei: die Message ist fuer Logs, nicht fuer die UI.
+  const s = game(4);
+  try {
+    reduce(s, { type: "play", player: 1, cardId: 1 });
+    assert.fail("kein Fehler geworfen");
+  } catch (e) {
+    assert.ok(e instanceof EngineError);
+    assert.equal(e.code, "notYourTurn");
+    assert.match(e.message, /^[\x20-\x7E]+$/, "Message muss reines ASCII (Englisch) sein");
+    assert.equal(e.name, "EngineError");
+  }
+});
+
+test("Wunschkarte ohne Farbwahl liefert wildNeedsColor", () => {
+  const s = game(4);
+  s.players[0].hand.push({ id: 951, color: null, value: "wild4" });
+  assert.throws(() => reduce(s, { type: "play", player: 0, cardId: 951 }),
+    (e: EngineError) => e instanceof EngineError && e.code === "wildNeedsColor");
 });
 
 test("Wunschkarte ohne Farbwahl wird abgelehnt", () => {

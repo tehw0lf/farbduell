@@ -34,7 +34,7 @@
 
   onMount(() => {
     applyTheme(settings.theme);
-    adapter.onError = (msg) => toast(msg);
+    adapter.onError = (code) => toast(t.errors[code]);
     const unsub = adapter.subscribe((v) => {
       view = v;
       for (const ev of v.events) handleEvent(v, ev);

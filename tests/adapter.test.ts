@@ -8,8 +8,9 @@ import assert from "node:assert/strict";
 import { LocalAdapter } from "../src/lib/adapter/local.ts";
 import { chooseBotAction } from "../src/lib/engine/bot.ts";
 import type { PlayerView } from "../src/lib/engine/types.ts";
-import { STACK_MODES } from "../src/lib/engine/types.ts";
+import { ENGINE_ERROR_CODES, STACK_MODES } from "../src/lib/engine/types.ts";
 import { DEFAULT_SETTINGS, migrateStackMode } from "../src/lib/settings.ts";
+import { TRANSLATIONS, type Lang } from "../src/lib/i18n.ts";
 
 function delay(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
@@ -61,6 +62,45 @@ test("newGame entwertet laufende Bot-Züge (kein Geister-Zug)", async () => {
   // direkt nach newGame ist turn 0; ein Geister-Zug der alten Partie würde
   // einen reduce auf inkonsistentem Zustand auslösen und im console.error landen.
   assert.ok(turns.length >= len, "subscribe lebt");
+  adapter.destroy();
+});
+
+/* ---------- Lokalisierte Regelverstoesse ---------- */
+
+test("jeder EngineError-Code hat in jeder Sprache einen Text", () => {
+  // Ohne diesen Test faellt ein vergessener Code erst als leerer Toast auf.
+  const langs = Object.keys(TRANSLATIONS) as Lang[];
+  assert.ok(langs.length >= 2, "es sollten mindestens de und en existieren");
+  for (const lang of langs) {
+    for (const code of ENGINE_ERROR_CODES) {
+      const text = TRANSLATIONS[lang].errors[code];
+      assert.equal(typeof text, "string", `${lang}.errors.${code} fehlt`);
+      assert.ok(text.trim().length > 0, `${lang}.errors.${code} ist leer`);
+    }
+  }
+});
+
+test("die Sprachen unterscheiden sich tatsächlich (kein kopierter Block)", () => {
+  // Faengt den Fall ab, dass der englische Block versehentlich deutsch bleibt.
+  const different = ENGINE_ERROR_CODES.filter(
+    (code) => TRANSLATIONS.de.errors[code] !== TRANSLATIONS.en.errors[code],
+  );
+  assert.equal(different.length, ENGINE_ERROR_CODES.length,
+    "diese Codes sind in beiden Sprachen identisch: " +
+    ENGINE_ERROR_CODES.filter((c) => !different.includes(c)).join(", "));
+});
+
+test("LocalAdapter meldet den Fehlercode, nicht den Text", () => {
+  const adapter = new LocalAdapter({ botDelayMs: () => 100000 });
+  const codes: string[] = [];
+  adapter.onError = (code) => codes.push(code);
+  adapter.newGame({ botCount: 3, rules: { stackMode: "off", drawToMatch: false, zeroChain: false }, lang: "de" });
+
+  // Karte, die es nicht gibt
+  adapter.dispatch({ type: "play", cardId: -1 });
+  assert.deepEqual(codes, ["cardNotInHand"]);
+  // Der Code muss uebersetzbar sein
+  assert.ok(TRANSLATIONS.de.errors[codes[0] as keyof typeof TRANSLATIONS.de.errors]);
   adapter.destroy();
 });
 

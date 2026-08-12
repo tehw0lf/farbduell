@@ -132,4 +132,36 @@ export interface PlayerView {
   events: GameEvent[];
 }
 
-export class EngineError extends Error {}
+/**
+ * Stabile Kennungen für Regelverstöße. Die Engine bleibt sprachfrei – sie
+ * kennt keine Übersetzungen, weil sie später auch auf einem Server läuft,
+ * der nicht weiß, welche Sprache ein Client eingestellt hat. Die UI bildet
+ * den Code auf einen übersetzten Text ab; die Message der Exception bleibt
+ * ein englischer Entwicklertext für Logs und Stacktraces.
+ */
+export const ENGINE_ERROR_CODES = [
+  "playerCount",
+  "roundOver",
+  "notYourTurn",
+  "wildNeedsColor",
+  "decideDrawnFirst",
+  "cardNotInHand",
+  "cardDoesNotFit",
+  "mustPlayZero",
+  "noDrawnCard",
+  "drawnCardMissing",
+] as const;
+
+export type EngineErrorCode = (typeof ENGINE_ERROR_CODES)[number];
+
+export class EngineError extends Error {
+  // Als normales Feld statt Parameter-Property: Node fuehrt die Tests im
+  // strip-only-Modus aus, der keinen Code erzeugen darf.
+  readonly code: EngineErrorCode;
+
+  constructor(code: EngineErrorCode, message: string) {
+    super(message);
+    this.name = "EngineError";
+    this.code = code;
+  }
+}
