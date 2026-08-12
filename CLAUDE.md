@@ -52,6 +52,18 @@ Svelte 5 components. `App.svelte` wires the adapter to the UI and manages toasts
 
 The engine is designed for a future `RemoteAdapter` (WebSocket). The server would import the same `src/lib/engine/` files, hold `GameState` per room, apply `reduce()` authoritatively, and broadcast `playerView(state, i)` to each client. See the README for the full roadmap.
 
+## Deliberate deviations from the original game
+
+**The `wild4` card already combines both effects** — it makes the next player draw 4 *and* lets the player wish for a color, unlike `draw2` (penalty only) and `wild` (color only). That part matches the original.
+
+**What is deliberately missing is the restriction that `wild4` may only be played when no card of the current color is in hand.** In the original that rule comes as a pair: you *may* bluff, and the next player may challenge — with a penalty for whoever was wrong. The bluff is the rule. Enforcing only the restriction, without challenging, is *stricter* than the real game: since players usually hold something matching, the card would become nearly unplayable and the interesting part would be gone.
+
+Implementing the challenge properly does not fit the architecture either: it requires revealing one player's hand to another, and `playerView()` hiding foreign hands is exactly the anti-cheat mechanism the planned multiplayer mode relies on. Bots would additionally need to bluff and to judge bluffs.
+
+There is also a structural reason it would be intrusive: `canPlay()` deliberately receives a single card, never the hand. This would be the only rule whose legality depends on the player's *other* cards — and two of its call sites ask about a freshly drawn card that is not part of an evaluated hand yet.
+
+If this is ever wanted anyway, the sane version is an opt-in house rule (`strictWild4`, default off) that enforces the restriction without challenging — not a change to the default behaviour.
+
 ## Adding house rules
 
 1. Add a field to `Rules` in [src/lib/engine/types.ts](src/lib/engine/types.ts). If the variants are mutually exclusive, model them as a union type (like `StackMode`) rather than several booleans — invalid combinations then cannot be represented at all
