@@ -136,6 +136,8 @@ function applyCard(s: GameState, player: number, card: Card, chosenColor?: Color
 
   switch (card.value) {
     case "0": {
+      // Eine Siegkarte hinterlaesst keine Forderung – darum kuemmert sich
+      // zentral der Rundenabschluss weiter unten.
       if (s.rules.zeroChain) {
         s.pendingZero = true;
         s.events.push({ kind: "zeroDemanded", player: nextIdx(s, player, 1) });
@@ -194,6 +196,15 @@ function applyCard(s: GameState, player: number, card: Card, chosenColor?: Color
   if (p.hand.length === 0) {
     s.phase = "finished";
     s.winner = player;
+    // Offene Forderungen verfallen mit der Runde – niemand kommt mehr an den Zug,
+    // um sie zu erfuellen, und ein Endzustand mit offener Forderung waere
+    // widerspruechlich (gilt fuer die Siegkarte 0, +2 und +4 gleichermassen).
+    s.pendingZero = false;
+    s.pendingDraw = 0;
+    s.pendingDrawKind = "none";
+    s.events = s.events.filter(
+      (e) => e.kind !== "zeroDemanded" && e.kind !== "penaltyGrew",
+    );
     s.events.push({ kind: "won", player });
     return;
   }
@@ -248,6 +259,11 @@ export function reduce(state: GameState, action: Action): GameState {
       // Offene Null-Forderung: genau eine Karte ziehen, Zug endet.
       // Die gezogene Karte darf nicht sofort gelegt werden – die Kette bricht.
       if (s.pendingZero) {
+        // Ziehen ist nur erlaubt, wer wirklich keine 0 hat – sonst liesse sich
+        // die Kette durch blosses Verweigern der eigenen 0 abbrechen.
+        if (s.players[action.player].hand.some((c) => isPlayable(s, c))) {
+          throw new EngineError("mustPlayZero", "a zero must be played while the zero chain is open");
+        }
         drawMany(s, action.player, 1);
         s.pendingZero = false;
         // zeroMissed ersetzt hier das generische drew-Event – eine Meldung genügt.

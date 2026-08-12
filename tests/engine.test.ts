@@ -65,6 +65,9 @@ function simulate(s: GameState, rand: () => number): GameState {
     );
   }
   assert.equal(s.phase, "finished", "Partie endete nicht");
+  // Nach Spielende darf keine Forderung offen sein – sie koennte niemand mehr erfuellen
+  assert.equal(s.pendingZero, false, "offene Null-Forderung nach Spielende");
+  assert.equal(s.pendingDraw, 0, "offener Strafstapel nach Spielende");
   return s;
 }
 
@@ -357,6 +360,7 @@ test("Null-Kette: ohne 0 wird genau eine Karte gezogen, Zug endet", () => {
   const t = topCard(s);
   s.players[0].hand.push({ id: 750, color: t.color, value: "0" });
   s = reduce(s, { type: "play", player: 0, cardId: 750 });
+  s.players[1].hand = s.players[1].hand.filter((c) => c.value !== "0"); // garantiert keine 0
   const before = s.players[1].hand.length;
   s = reduce(s, { type: "draw", player: 1 });
   assert.equal(s.players[1].hand.length, before + 1, "genau eine Karte");
@@ -371,9 +375,35 @@ test("Null-Kette: drawToMatch zieht trotzdem nur eine Karte", () => {
   const t = topCard(s);
   s.players[0].hand.push({ id: 760, color: t.color, value: "0" });
   s = reduce(s, { type: "play", player: 0, cardId: 760 });
+  s.players[1].hand = s.players[1].hand.filter((c) => c.value !== "0");
   const before = s.players[1].hand.length;
   s = reduce(s, { type: "draw", player: 1 });
   assert.equal(s.players[1].hand.length, before + 1);
+});
+
+test("Null-Kette: mit einer 0 auf der Hand ist Ziehen verboten", () => {
+  // Sonst liesse sich die Kette durch blosses Verweigern der eigenen 0 abbrechen.
+  let s = game(4, rules({ zeroChain: true }));
+  const t = topCard(s);
+  s.players[0].hand.push({ id: 790, color: t.color, value: "0" });
+  s = reduce(s, { type: "play", player: 0, cardId: 790 });
+  s.players[1].hand.push({ id: 791, color: "gold", value: "0" });
+  assert.throws(() => reduce(s, { type: "draw", player: 1 }), EngineError);
+
+  // Die 0 legen geht weiterhin und setzt die Forderung neu
+  const next = reduce(s, { type: "play", player: 1, cardId: 791 });
+  assert.equal(next.pendingZero, true);
+  assert.equal(next.turn, 2);
+});
+
+test("Null-Kette: Sieg mit der letzten 0 fordert von niemandem mehr eine 0", () => {
+  let s = game(4, rules({ zeroChain: true }));
+  const t = topCard(s);
+  s.players[0].hand = [{ id: 792, color: t.color, value: "0" }];
+  s = reduce(s, { type: "play", player: 0, cardId: 792 });
+  assert.equal(s.phase, "finished");
+  assert.equal(s.pendingZero, false, "keine Forderung an einen Spieler, der nie dran kommt");
+  assert.ok(!s.events.some((e) => e.kind === "zeroDemanded"), "kein zeroDemanded nach Spielende");
 });
 
 test("Null-Kette aus: 0 verhält sich wie eine normale Zahlenkarte", () => {
