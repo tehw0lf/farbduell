@@ -1,4 +1,4 @@
-import type { Color } from "./engine/types.ts";
+import type { Color, EngineErrorCode } from "./engine/types.ts";
 
 export type Lang = "de" | "en";
 
@@ -41,6 +41,20 @@ export const TRANSLATIONS = {
       `${name} ${you ? "rufst" : "ruft"}: „Letzte Karte!"`,
     reshuffled: "Ablagestapel neu gemischt",
     timeout: "Zeit um – du ziehst automatisch",
+
+    // Regelverstoesse: Texte zu den Codes aus EngineError
+    errors: {
+      playerCount: "2 bis 10 Spieler.",
+      roundOver: "Die Runde ist vorbei.",
+      notYourTurn: "Nicht dein Zug.",
+      wildNeedsColor: "Wunschkarte braucht eine Farbwahl.",
+      decideDrawnFirst: "Entscheide erst über die gezogene Karte.",
+      cardNotInHand: "Karte nicht auf der Hand.",
+      cardDoesNotFit: "Karte passt nicht.",
+      mustPlayZero: "Du musst eine 0 legen.",
+      noDrawnCard: "Keine gezogene Karte offen.",
+      drawnCardMissing: "Gezogene Karte nicht gefunden.",
+    } as Record<EngineErrorCode, string>,
 
     // Player names
     you: "Du",
@@ -173,6 +187,20 @@ export const TRANSLATIONS = {
       `${name} ${you ? "call" : "calls"}: "Last card!"`,
     reshuffled: "Discard pile reshuffled",
     timeout: "Time's up – drawing automatically",
+
+    // Rule violations: texts for the codes from EngineError
+    errors: {
+      playerCount: "2 to 10 players.",
+      roundOver: "The round is over.",
+      notYourTurn: "It's not your turn.",
+      wildNeedsColor: "A wild card needs a color.",
+      decideDrawnFirst: "Decide about the drawn card first.",
+      cardNotInHand: "That card isn't in your hand.",
+      cardDoesNotFit: "That card doesn't fit.",
+      mustPlayZero: "You have to play a 0.",
+      noDrawnCard: "No drawn card pending.",
+      drawnCardMissing: "Drawn card not found.",
+    } as Record<EngineErrorCode, string>,
 
     // Player names
     you: "You",

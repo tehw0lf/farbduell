@@ -27,7 +27,7 @@ const HAND_SIZE = 7;
 
 export function createGame(opts: CreateGameOptions): GameState {
   if (opts.names.length < 2 || opts.names.length > 10) {
-    throw new EngineError("2 bis 10 Spieler");
+    throw new EngineError("playerCount", "game requires 2 to 10 players");
   }
   let rng = (opts.seed ?? (Date.now() ^ (Math.random() * 0xffffffff))) | 0;
 
@@ -203,13 +203,13 @@ function applyCard(s: GameState, player: number, card: Card, chosenColor?: Color
 /* ---------- Validierung ---------- */
 
 function assertTurn(s: GameState, action: Action) {
-  if (s.phase === "finished") throw new EngineError("Die Runde ist vorbei.");
-  if (action.player !== s.turn) throw new EngineError("Nicht dein Zug.");
+  if (s.phase === "finished") throw new EngineError("roundOver", "the round is already over");
+  if (action.player !== s.turn) throw new EngineError("notYourTurn", "not this player's turn");
 }
 
 function assertChosenColor(card: Card, chosenColor?: Color) {
   if (card.color === null && !chosenColor) {
-    throw new EngineError("Wunschkarte braucht eine Farbwahl.");
+    throw new EngineError("wildNeedsColor", "wild card requires a chosen color");
   }
 }
 
@@ -222,10 +222,10 @@ export function reduce(state: GameState, action: Action): GameState {
   switch (action.type) {
     case "play": {
       assertTurn(s, action);
-      if (s.phase !== "playing") throw new EngineError("Erst über die gezogene Karte entscheiden.");
+      if (s.phase !== "playing") throw new EngineError("decideDrawnFirst", "must decide about the drawn card first");
       const card = s.players[action.player].hand.find((c) => c.id === action.cardId);
-      if (!card) throw new EngineError("Karte nicht auf der Hand.");
-      if (!isPlayable(s, card)) throw new EngineError("Karte passt nicht.");
+      if (!card) throw new EngineError("cardNotInHand", "card is not in the player's hand");
+      if (!isPlayable(s, card)) throw new EngineError("cardDoesNotFit", "card is not playable right now");
       assertChosenColor(card, action.chosenColor);
       applyCard(s, action.player, card, action.chosenColor);
       return s;
@@ -233,7 +233,7 @@ export function reduce(state: GameState, action: Action): GameState {
 
     case "draw": {
       assertTurn(s, action);
-      if (s.phase !== "playing") throw new EngineError("Erst über die gezogene Karte entscheiden.");
+      if (s.phase !== "playing") throw new EngineError("decideDrawnFirst", "must decide about the drawn card first");
 
       // Strafstapel schlucken
       if (s.pendingDraw > 0) {
@@ -283,9 +283,9 @@ export function reduce(state: GameState, action: Action): GameState {
 
     case "playDrawn": {
       assertTurn(s, action);
-      if (s.phase !== "drawnDecision") throw new EngineError("Keine gezogene Karte offen.");
+      if (s.phase !== "drawnDecision") throw new EngineError("noDrawnCard", "no drawn card pending");
       const card = s.players[action.player].hand.find((c) => c.id === s.drawnCardId);
-      if (!card) throw new EngineError("Gezogene Karte nicht gefunden.");
+      if (!card) throw new EngineError("drawnCardMissing", "drawn card not found in hand");
       assertChosenColor(card, action.chosenColor);
       s.phase = "playing";
       s.drawnCardId = null;
@@ -295,7 +295,7 @@ export function reduce(state: GameState, action: Action): GameState {
 
     case "keepDrawn": {
       assertTurn(s, action);
-      if (s.phase !== "drawnDecision") throw new EngineError("Keine gezogene Karte offen.");
+      if (s.phase !== "drawnDecision") throw new EngineError("noDrawnCard", "no drawn card pending");
       s.phase = "playing";
       s.drawnCardId = null;
       s.turn = nextIdx(s, action.player, 1);

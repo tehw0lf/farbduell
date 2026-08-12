@@ -1,4 +1,4 @@
-import type { Action, GameState, PlayerView, Rules } from "../engine/types.ts";
+import type { Action, EngineErrorCode, GameState, PlayerView, Rules } from "../engine/types.ts";
 import { EngineError } from "../engine/types.ts";
 import { createGame, reduce } from "../engine/engine.ts";
 import { playerView } from "../engine/view.ts";
@@ -41,7 +41,7 @@ function clearState(): void {
 
 /** Bots im Browser: gleiche Engine, gleiche Bot-Logik wie ein späterer Server. */
 export class LocalAdapter implements GameAdapter {
-  onError?: (message: string) => void;
+  onError?: (code: EngineErrorCode) => void;
 
   private state: GameState | null = null;
   private listeners = new Set<(view: PlayerView) => void>();
@@ -87,7 +87,7 @@ export class LocalAdapter implements GameAdapter {
       this.emit();
       this.scheduleBots();
     } catch (err) {
-      if (err instanceof EngineError) this.onError?.(err.message);
+      if (err instanceof EngineError) this.onError?.(err.code);
       else throw err;
     }
   }
